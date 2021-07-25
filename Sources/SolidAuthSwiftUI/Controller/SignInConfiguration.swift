@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AuthenticationServices
 
 public struct SignInConfiguration {
     // e.g., "https://solidcommunity.net"
@@ -20,10 +21,18 @@ public struct SignInConfiguration {
     // e.g., [.openid, .profile, .webid, .offlineAccess]
     public let scopes: Set<Scope>
     
-    public init(issuer: String, redirectURI: String, clientName: String, scopes: Set<Scope>) {
+    // e.g., [.code, .token]
+    let responseTypes: Set<ResponseType>
+    
+    // Can be used to provide context when presenting the sign in screen.
+    let presentationContextProvider: ASWebAuthenticationPresentationContextProviding?
+    
+    public init(issuer: String, redirectURI: String, clientName: String, scopes: Set<Scope>, responseTypes: Set<ResponseType>, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil) {
         self.issuer = issuer
         self.redirectURI = redirectURI
         self.clientName = clientName
         self.scopes = scopes
+        self.responseTypes = responseTypes
+        self.presentationContextProvider = presentationContextProvider
     }
 }

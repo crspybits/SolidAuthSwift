@@ -31,7 +31,6 @@ class QueryUtilities: NSObject {
      */
     var dictionaryValue: [String : (NSObject & NSCopying)] = [:]
     
-    
     convenience init(url URL: URL) throws {
         self.init()
         
@@ -73,11 +72,9 @@ class QueryUtilities: NSObject {
         return values
     }
     
-    
     func values(forParameter parameter: String) -> [String]? {
         return parameters[parameter]
     }
-    
     
     func addParameter(_ parameter: String, value: String?) {
         var parameterValues = parameters[parameter]
@@ -88,7 +85,6 @@ class QueryUtilities: NSObject {
         parameterValues?.append(value!)
         parameters[parameter] = parameterValues
     }
-    
     
     func addParameters(_ parameters: [String : AnyCodable]?) {
         guard parameters != nil else { return}
@@ -103,7 +99,6 @@ class QueryUtilities: NSObject {
      @discussion The parameter names and values are NOT URL encoded.
      @return An array of unencoded @c NSURLQueryItem objects.
      */
-    
     func queryItems() throws -> [URLQueryItem] {
         var queryParameters = [URLQueryItem]()
         for parameterName in parameters.keys {
@@ -126,7 +121,6 @@ class QueryUtilities: NSObject {
         allowedParamCharacters.remove(charactersIn: kQueryStringParamAdditionalDisallowedCharacters)
         return allowedParamCharacters
     }
-    
     
     /*! @brief Builds a query string that can be set to @c NSURLComponents.percentEncodedQuery
      @discussion This string is percent encoded, and shouldn't be used with
@@ -171,7 +165,6 @@ class QueryUtilities: NSObject {
         return encodedQuery
     }
     
-    
     func urlByReplacingQuery(in URL: URL?) throws -> URL? {
         var components: URLComponents? = nil
         if let anURL = URL {
@@ -183,11 +176,19 @@ class QueryUtilities: NSObject {
         let URLWithParameters: URL? = components?.url
         return URLWithParameters
     }
-    
-    
-    
+
     func description() -> String? {
         return String(format: "<%@: %p, parameters: %@>", NSStringFromClass(type(of: self).self), self, parameters)
     }
 }
 
+// Adapted from https://stackoverflow.com/questions/4271916/url-minus-query-string-in-objective-c
+extension URL {
+    func absoluteStringByTrimmingQuery() -> String? {
+        if var urlcomponents = URLComponents(url: self, resolvingAgainstBaseURL: false) {
+            urlcomponents.query = nil
+            return urlcomponents.string
+        }
+        return nil
+    }
+}
