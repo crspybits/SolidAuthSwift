@@ -9,10 +9,11 @@
 import UIKit
 import AuthenticationServices
 
-//typealias OIDAuthorizationCallback = (OIDAuthorizationResponse?, Error?) -> Void
 fileprivate let kGrantTypeAuthorizationCode = "authorization_code"
 
-public class Authorization: NSObject, URLSessionDelegate {
+// Needs to be subclass of NSObject for `ASWebAuthenticationPresentationContextProviding` conformanace.
+
+public class Authorization: NSObject {
     enum AuthorizationError: Error {
         case flowNotStarted
         case couldNotGetParameters
@@ -21,11 +22,10 @@ public class Authorization: NSObject, URLSessionDelegate {
     let request: AuthorizationRequest
     var presentationContextProvider: ASWebAuthenticationPresentationContextProviding?
     
-    // If you keep a nil `presentationContextProvider`, this class provides a default.
+    // If you use a nil `presentationContextProvider`, this class provides a default.
     public init(request: AuthorizationRequest, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil) {
         self.request = request
         self.presentationContextProvider = presentationContextProvider
-        super.init()
     }
     
     public func makeRequest(completion: @escaping (Error?) -> Void) {
@@ -60,6 +60,8 @@ public class Authorization: NSObject, URLSessionDelegate {
             completion(AuthorizationError.couldNotGetParameters)
             return false
         }
+
+        logger.debug("requestURL: \(requestURL)")
         
         let authenticationVC = ASWebAuthenticationSession(url: requestURL, callbackURLScheme: redirectScheme, completionHandler: { callbackURL, error in
 
@@ -74,8 +76,8 @@ public class Authorization: NSObject, URLSessionDelegate {
 //                self.failExternalUserAgentFlow(error: safariError!)
 //            }
         })
-        
-        authenticationVC.presentationContextProvider = presentationContextProvider
+
+        authenticationVC.presentationContextProvider = presentationContextProvider ?? self
         
         return authenticationVC.start()
 
@@ -374,11 +376,11 @@ public class Authorization: NSObject, URLSessionDelegate {
         
         }).resume()
     }
-#endif
     
     public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
     }
+#endif
 }
 
 #if false
@@ -391,7 +393,7 @@ extension AuthenticateWithProviderViewController: ASWebAuthenticationPresentatio
 #endif
 
 extension Authorization: ASWebAuthenticationPresentationContextProviding {
-    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+    public func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         return ASPresentationAnchor()
     }
 }

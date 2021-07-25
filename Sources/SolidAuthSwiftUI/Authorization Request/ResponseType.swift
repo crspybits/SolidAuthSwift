@@ -7,8 +7,12 @@
 
 import Foundation
 
-public enum ResponseType: String {
+public enum ResponseType: String, Codable {
     case code
-    case token
     case idToken = "id_token"
+    
+    // To a string, separated with blanks
+    static func toString(_ types: Set<ResponseType>) -> String {
+        types.map { $0.rawValue}.joined(separator: " ")
+    }
 }

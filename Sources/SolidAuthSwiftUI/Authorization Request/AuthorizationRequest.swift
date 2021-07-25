@@ -27,9 +27,10 @@ fileprivate let kCodeVerifierBytes: Int = 32
 public class AuthorizationRequest: NSObject, Codable  {
     enum AuthorizationRequestError: Error {
         case unsupportedResponseType(String)
+        case badScopes
     }
         
-    private(set) var configuration: ProviderConfiguration?
+    let configuration: ProviderConfiguration
     /*! @brief The expected response type.
      @remarks response_type
      @discussion Generally 'code' if pure OAuth, otherwise a space-delimited list of of response
@@ -37,12 +38,12 @@ public class AuthorizationRequest: NSObject, Codable  {
      @see https://tools.ietf.org/html/rfc6749#section-3.1.1
      @see http://openid.net/specs/openid-connect-core-1_0.html#rfc.section.3
      */
-    private(set) var responseType = ""
+    let responseType: Set<ResponseType>
     /*! @brief The client identifier.
      @remarks client_id
      @see https://tools.ietf.org/html/rfc6749#section-2.2
      */
-    private(set) var clientID = ""
+    let clientID: String
     /*! @brief The client secret.
      @remarks client_secret
      @discussion The client secret is used to prove that identity of the client when exchaning an
@@ -51,18 +52,18 @@ public class AuthorizationRequest: NSObject, Codable  {
      exchanging the authorization code for an access token.
      @see https://tools.ietf.org/html/rfc6749#section-2.3.1
      */
-    private(set) var clientSecret: String?
+    let clientSecret: String?
     /*! @brief The value of the scope parameter is expressed as a list of space-delimited,
      case-sensitive strings.
      @remarks scope
      @see https://tools.ietf.org/html/rfc6749#section-3.3
      */
-    private(set) var scope: String?
+    let scopes: Set<Scope>
     /*! @brief The client's redirect URI.
      @remarks redirect_uri
      @see https://tools.ietf.org/html/rfc6749#section-3.1.2
      */
-    private(set) var redirectURL: URL?
+    let redirectURL: URL
     
     //  The converted code is limited to 2 KB.
     //  Upgrade your plan to remove this limitation.
@@ -76,7 +77,7 @@ public class AuthorizationRequest: NSObject, Codable  {
      @see https://tools.ietf.org/html/rfc6749#section-4.1.1
      @see https://tools.ietf.org/html/rfc6819#section-5.3.5
      */
-    private(set) var state: String?
+    let state: String?
     /*! @brief String value used to associate a Client session with an ID Token, and to mitigate replay
      attacks. The value is passed through unmodified from the Authentication Request to the ID
      Token. Sufficient entropy MUST be present in the nonce values used to prevent attackers from
@@ -86,7 +87,7 @@ public class AuthorizationRequest: NSObject, Codable  {
      perform appropriate validation of the nonce in the ID Token.
      @see https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest
      */
-    private(set) var nonce: String?
+    let nonce: String?
     /*! @brief The PKCE code verifier.
      @remarks code_verifier
      @discussion The code verifier itself is not included in the authorization request that is sent
@@ -95,39 +96,36 @@ public class AuthorizationRequest: NSObject, Codable  {
      includes this parameter automatically.
      @see https://tools.ietf.org/html/rfc7636#section-4.1
      */
-    private(set) var codeVerifier: String?
+    let codeVerifier: String?
     /*! @brief The PKCE code challenge, derived from #codeVerifier.
      @remarks code_challenge
      @see https://tools.ietf.org/html/rfc7636#section-4.2
      */
-    private(set) var codeChallenge: String?
+    let codeChallenge: String?
     /*! @brief The method used to compute the @c #codeChallenge
      @remarks code_challenge_method
      @see https://tools.ietf.org/html/rfc7636#section-4.3
      */
-    private(set) var codeChallengeMethod: String?
+    let codeChallengeMethod: String?
     /*! @brief The client's additional authorization parameters.
      @see https://tools.ietf.org/html/rfc6749#section-3.1
      */
-    private(set) var additionalParameters: [String : AnyCodable]?
+    let additionalParameters: [String : AnyCodable]?
     
-    class func isSupportedResponseType(_ responseType: String?) -> Bool {
-        let codeIdToken = [ResponseType.code.rawValue, ResponseType.idToken.rawValue].joined(separator: " ")
-        let idTokenCode = [ResponseType.idToken.rawValue, ResponseType.code.rawValue].joined(separator: " ")
-        return (responseType == ResponseType.code.rawValue) || (responseType == codeIdToken) || (responseType == idTokenCode)
-    }
-    
-    public init(configuration: ProviderConfiguration, clientID: String, clientSecret: String?, scope: String?, redirectURL: URL?, responseType: String, state: String?, nonce: String?, codeVerifier: String?, codeChallenge: String?, codeChallengeMethod: String?, additionalParameters: [String : AnyCodable]?) throws {
-        super.init()
+    public init(configuration: ProviderConfiguration, clientID: String, clientSecret: String?, scopes: Set<Scope>, redirectURL: URL, responseType: Set<ResponseType>, state: String?, nonce: String?, codeVerifier: String?, codeChallenge: String?, codeChallengeMethod: String?, additionalParameters: [String : AnyCodable]?) throws {
         
         self.configuration = configuration
         self.clientID = clientID
         self.clientSecret = clientSecret
-        self.scope = scope
+        self.scopes = scopes
         self.redirectURL = redirectURL
         self.responseType = responseType
         
-        guard Self.isSupportedResponseType(self.responseType) else {
+        guard responseType.count >= 1 else {
+            throw AuthorizationRequestError.unsupportedResponseType("Empty response type")
+        }
+        
+        if responseType.count == 1 && !responseType.contains(.code) {
             throw AuthorizationRequestError.unsupportedResponseType("The response_type \"\(responseType)\" isn't supported. AppAuth only supports the \"code\" or \"code id_token\" response_type.")
         }
 
@@ -137,16 +135,21 @@ public class AuthorizationRequest: NSObject, Codable  {
         self.codeChallenge = codeChallenge
         self.codeChallengeMethod = codeChallengeMethod
         self.additionalParameters = additionalParameters // copyItems: true
+        
+        super.init()
+    }
+
+    /**
+     * Generates PKCE code verifier and challenge; sets a code challenge method of OIDOAuthorizationRequestCodeChallengeMethodS256
+     */
+    public convenience init(configuration: ProviderConfiguration, clientID: String, clientSecret: String? = nil, scopes: Set<Scope>, redirectURL: URL, responseType: Set<ResponseType>, additionalParameters: [String : AnyCodable]? = nil) throws {
+        
+        let codeVerifier = Self.generateCodeVerifier()
+        let codeChallenge = Self.codeChallengeS256(forVerifier: codeVerifier)
+        try self.init(configuration: configuration, clientID: clientID, clientSecret: clientSecret, scopes: scopes, redirectURL: redirectURL, responseType: responseType, state: Self.generateState(), nonce: Self.generateState(), codeVerifier: codeVerifier, codeChallenge: codeChallenge, codeChallengeMethod: OIDOAuthorizationRequestCodeChallengeMethodS256, additionalParameters: additionalParameters)
     }
     
-    convenience init(configuration: ProviderConfiguration, clientID: String, clientSecret: String?, scopes: [String], redirectURL: URL?, responseType: String, additionalParameters: [String : AnyCodable]?) throws {
-        // generates PKCE code verifier and challenge
-        let codeVerifier = AuthorizationRequest.generateCodeVerifier()
-        let codeChallenge = AuthorizationRequest.codeChallengeS256(forVerifier: codeVerifier)
-        try self.init(configuration: configuration, clientID: clientID, clientSecret: clientSecret, scope: ScopeUtilities.scopes(withArray: scopes), redirectURL: redirectURL, responseType: responseType, state: AuthorizationRequest.generateState(), nonce: AuthorizationRequest.generateState(), codeVerifier: codeVerifier, codeChallenge: codeChallenge, codeChallengeMethod: OIDOAuthorizationRequestCodeChallengeMethodS256, additionalParameters: additionalParameters)
-    }
-    
-    convenience init(configuration: ProviderConfiguration, clientID: String, scopes: [String], redirectURL: URL?, responseType: String, additionalParameters: [String : AnyCodable]?) throws {
+    public convenience init(configuration: ProviderConfiguration, clientID: String, scopes: Set<Scope>, redirectURL: URL, responseType: Set<ResponseType>, additionalParameters: [String : AnyCodable]?) throws {
         try self.init(configuration: configuration, clientID: clientID, clientSecret: nil, scopes: scopes, redirectURL: redirectURL, responseType: responseType, additionalParameters: additionalParameters)
     }
 
@@ -174,17 +177,15 @@ public class AuthorizationRequest: NSObject, Codable  {
     func authorizationRequestURL() throws -> URL? {
         let query = QueryUtilities()
         // Required parameters.
-        query.addParameter(kResponseTypeKey, value: responseType)
+        let responseTypeString = ResponseType.toString(responseType)
+        query.addParameter(kResponseTypeKey, value: responseTypeString)
         query.addParameter(kClientIDKey, value: clientID)
         // Add any additional parameters the client has specified.
         query.addParameters(additionalParameters)
         // Add optional parameters, as applicable.
-        if let redirectURL = redirectURL {
-            query.addParameter(kRedirectURLKey, value: redirectURL.absoluteString)
-        }
-        if scope != nil {
-            query.addParameter(kScopeKey, value: scope)
-        }
+        query.addParameter(kRedirectURLKey, value: redirectURL.absoluteString)
+        let scopesString = Scope.toString(scopes)
+        query.addParameter(kScopeKey, value: scopesString)
         if state != nil {
             query.addParameter(kStateKey, value: state)
         }
@@ -198,20 +199,15 @@ public class AuthorizationRequest: NSObject, Codable  {
             query.addParameter(kCodeChallengeMethodKey, value: codeChallengeMethod)
         }
         // Construct the URL:
-        return try query.urlByReplacingQuery(in: configuration!.authorizationEndpoint)
-        
-        // Testing only
-       // return query.urlByReplacingQuery(in: URL(string: "https://192.168.1.24:8443/authorize"))
-        
+        return try query.urlByReplacingQuery(in: configuration.authorizationEndpoint)
     }
     
     func externalUserAgentRequestURL() throws -> URL? {
         return try authorizationRequestURL()
     }
     
-    
     func redirectScheme() -> String? {
-        return redirectURL?.scheme
+        return redirectURL.scheme
     }
 }
 
