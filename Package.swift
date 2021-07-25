@@ -10,11 +10,13 @@ let package = Package(
     ],
     products: [
         // iOS redirect to allow user to sign in via browser
+        // Intended for use on only iOS
         .library(
             name: "SolidAuthSwiftUI",
             targets: ["SolidAuthSwiftUI"]),
 
         // DPoP, Refresh, Validate tokens
+        // Intended for use on either iOS and Linux: So, keep iOS specifics out of this. Seems like there should be a way to indicate this with `platforms:` but not sure how to do that.
         .library(
             name: "SolidAuthSwiftTools",
             targets: ["SolidAuthSwiftTools"]),
