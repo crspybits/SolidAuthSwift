@@ -19,6 +19,7 @@ extension RegistrationRequest {
         case badStatusCode(Int)
         case oAuthError(String)
         case jsonDeserialization
+        case noData
     }
     
     public func send(queue: DispatchQueue = .main, completion: @escaping (Result<RegistrationResponse, Error>) -> Void) {
@@ -62,9 +63,14 @@ extension RegistrationRequest {
                 return
             }
             
+            guard let data = data else {
+                callCompletion(.failure(RegistrationRequestError.noData))
+                return
+            }
+            
             var json:[String : Any]?
             do {
-                json = try JSONSerialization.jsonObject(with: data!, options: []) as? [String : Any]
+                json = try JSONSerialization.jsonObject(with: data, options: []) as? [String : Any]
             }
             catch let error {
                 callCompletion(.failure(error))

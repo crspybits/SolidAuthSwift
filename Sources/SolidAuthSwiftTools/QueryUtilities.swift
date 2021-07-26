@@ -12,7 +12,7 @@ import AnyCodable
 
 private let kQueryStringParamAdditionalDisallowedCharacters = "=&+"
 
-class QueryUtilities: NSObject {
+public class QueryUtilities: NSObject {
     enum QueryUtilitiesError: Error {
         case noQueryItems
         case noParameterValue
@@ -20,18 +20,18 @@ class QueryUtilities: NSObject {
     
     /*! @brief A dictionary of parameter names and values representing the contents of the query.
      */
-    var parameters: [String : [String]] = [:]
+    public var parameters: [String : [String]] = [:]
     
     /*! @brief The parameter names in the query.
      */
-    private(set) var parameterNames: [String] = []
+    public private(set) var parameterNames: [String] = []
     /*! @brief The parameters represented as a dictionary.
      @remarks All values are @c NSString except for parameters which contain multiple values, in
      which case the value is an @c NSArray<NSString *> *.
      */
-    var dictionaryValue: [String : (NSObject & NSCopying)] = [:]
+    public var dictionaryValue: [String : (NSObject & NSCopying)] = [:]
     
-    convenience init(url URL: URL) throws {
+    public convenience init(url URL: URL) throws {
         self.init()
         
         // If NSURLQueryItem is available, use it for deconstructing the new URL. (iOS 8+)
@@ -51,11 +51,11 @@ class QueryUtilities: NSObject {
         }
     }
     
-    func parameterKeys() -> [String]? {
+    public func parameterKeys() -> [String]? {
         return Array(parameters.keys)
     }
     
-    func getDictionaryValue() throws -> [String : NSObject & NSCopying] {
+    public func getDictionaryValue() throws -> [String : NSObject & NSCopying] {
         // This method will flatten arrays in our @c _parameters' values if only one value exists.
         var values: [String : (NSObject & NSCopying)] = [:]
         for parameter in parameters.keys {
@@ -72,11 +72,11 @@ class QueryUtilities: NSObject {
         return values
     }
     
-    func values(forParameter parameter: String) -> [String]? {
+    public func values(forParameter parameter: String) -> [String]? {
         return parameters[parameter]
     }
     
-    func addParameter(_ parameter: String, value: String?) {
+    public func addParameter(_ parameter: String, value: String?) {
         var parameterValues = parameters[parameter]
         if parameterValues == nil {
             parameterValues = [String]()
@@ -86,7 +86,7 @@ class QueryUtilities: NSObject {
         parameters[parameter] = parameterValues
     }
     
-    func addParameters(_ parameters: [String : AnyCodable]?) {
+    public func addParameters(_ parameters: [String : AnyCodable]?) {
         guard parameters != nil else { return}
         for parameterName in (parameters!.keys) {
             if let value = parameters?[parameterName]?.value as? String {
@@ -99,7 +99,7 @@ class QueryUtilities: NSObject {
      @discussion The parameter names and values are NOT URL encoded.
      @return An array of unencoded @c NSURLQueryItem objects.
      */
-    func queryItems() throws -> [URLQueryItem] {
+    public func queryItems() throws -> [URLQueryItem] {
         var queryParameters = [URLQueryItem]()
         for parameterName in parameters.keys {
             guard let values = parameters[parameterName] else {
@@ -114,7 +114,7 @@ class QueryUtilities: NSObject {
         return queryParameters
     }
     
-    class func urlParamValueAllowedCharacters() -> CharacterSet? {
+    public class func urlParamValueAllowedCharacters() -> CharacterSet? {
         // Starts with the standard URL-allowed character set.
         var allowedParamCharacters = CharacterSet.urlQueryAllowed
         // Removes additional characters we don't want to see in the query component.
@@ -127,7 +127,7 @@ class QueryUtilities: NSObject {
      @c NSURLComponents.query.
      @return An percentage encoded query string.
      */
-    func percentEncodedQueryString() throws -> String {
+    public func percentEncodedQueryString() throws -> String {
         var parameterizedValues: [String] = []
         // Starts with the standard URL-allowed character set.
         let allowedParamCharacters: CharacterSet? = QueryUtilities.urlParamValueAllowedCharacters()
@@ -154,7 +154,7 @@ class QueryUtilities: NSObject {
         return queryString
     }
     
-    func urlEncodedParameters() throws -> String? {
+    public func urlEncodedParameters() throws -> String? {
         var components = URLComponents()
         components.queryItems = try queryItems()
         var encodedQuery = components.percentEncodedQuery
@@ -165,7 +165,7 @@ class QueryUtilities: NSObject {
         return encodedQuery
     }
     
-    func urlByReplacingQuery(in URL: URL?) throws -> URL? {
+    public func urlByReplacingQuery(in URL: URL?) throws -> URL? {
         var components: URLComponents? = nil
         if let anURL = URL {
             components = URLComponents(url: anURL, resolvingAgainstBaseURL: false)
@@ -177,14 +177,16 @@ class QueryUtilities: NSObject {
         return URLWithParameters
     }
 
-    func description() -> String? {
+#if os(iOS)
+    public func description() -> String? {
         return String(format: "<%@: %p, parameters: %@>", NSStringFromClass(type(of: self).self), self, parameters)
     }
+#endif
 }
 
 // Adapted from https://stackoverflow.com/questions/4271916/url-minus-query-string-in-objective-c
 extension URL {
-    func absoluteStringByTrimmingQuery() -> String? {
+    public func absoluteStringByTrimmingQuery() -> String? {
         if var urlcomponents = URLComponents(url: self, resolvingAgainstBaseURL: false) {
             urlcomponents.query = nil
             return urlcomponents.string

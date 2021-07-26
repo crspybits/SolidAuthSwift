@@ -25,7 +25,7 @@
 		837B82FF26AD0DCD00936600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		837B830226AD0DCD00936600 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		837B830426AD0DCD00936600 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		837B830F26AD109100936600 /* SolidAuthSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SolidAuthSwift; path = ../SolidAuthSwift; sourceTree = "<group>"; };
+		837B8A5E26AE46F800936600 /* SolidAuthSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SolidAuthSwift; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,7 +74,7 @@
 		837B830A26AD0DD400936600 /* Local Packages */ = {
 			isa = PBXGroup;
 			children = (
-				837B830F26AD109100936600 /* SolidAuthSwift */,
+				837B8A5E26AE46F800936600 /* SolidAuthSwift */,
 			);
 			name = "Local Packages";
 			sourceTree = "<group>";

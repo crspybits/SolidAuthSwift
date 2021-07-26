@@ -2,6 +2,7 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import Foundation
 
 let package = Package(
     name: "SolidAuthSwift",
@@ -24,6 +25,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.2"),
         .package(url: "https://github.com/Flight-School/AnyCodable.git", from: "0.6.0"),
+        .package(name: "SwiftJWT", url: "https://github.com/Kitura/Swift-JWT.git", from: "3.6.200"),
+        //.package(name: "CryptorRSA", url: "https://github.com/Kitura/BlueRSA.git", from: "1.0.201"),
     ],
     targets: [
         .target(
@@ -31,11 +34,14 @@ let package = Package(
             dependencies: [
                 .product(name: "Logging", package: "swift-log"),
                 "AnyCodable",
+                "SolidAuthSwiftTools"
             ],
             path: "Sources/SolidAuthSwiftUI"),
         .target(
             name: "SolidAuthSwiftTools",
             dependencies: [
+                "SwiftJWT",
+                "AnyCodable",
             ],
             path: "Sources/SolidAuthSwiftTools"),
             
@@ -49,3 +55,10 @@ let package = Package(
             path: "Tests/SolidAuthSwiftToolsTests"),
     ]
 )
+
+// Workaround: Because it doesn't currently seems possible to indicate that a target is for a specific platform only; see https://forums.swift.org/t/spm-build-fails-for-watchos-libraries/40474/9 and https://github.com/SDGGiesbrecht/SDGCornerstone/blob/ad52edf9fa206d1d83523e097e8b83bd48939b06/Package.swift#L754-L756
+if ProcessInfo.processInfo.environment["TARGETING_IOS"] == nil {
+  // print("ProcessInfo.processInfo.environment: \(ProcessInfo.processInfo.environment)")
+  package.targets.removeAll(where: { $0.name.hasPrefix("SolidAuthSwiftUI") })
+  package.products.removeAll(where: { $0.name.hasPrefix("SolidAuthSwiftUI") })
+}
