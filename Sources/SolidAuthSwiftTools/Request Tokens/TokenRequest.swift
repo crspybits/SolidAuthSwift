@@ -99,6 +99,8 @@ public class TokenRequest: NSObject {
         
         request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "content-type")
         request.addValue(dpopHeader, forHTTPHeaderField: DPoP.httpHeaderKey)
+        
+        print("request.allHTTPHeaderFields: \(request.allHTTPHeaderFields)")
 
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         session.dataTask(with: request, completionHandler: { data, response, error in
@@ -159,19 +161,24 @@ public class TokenRequest: NSObject {
         ]
         
         let pieces = values.map(self.urlEncode)
+        
+        // Without the "\n", I'm getting "Internal server error" in response to my request. At least on "https://solidcommunity.net"
         let bodyString = pieces.joined(separator: "&")
+        
+        print("Body: \(bodyString)")
         
         return Data(bodyString.utf8)
     }
 
     // Adapted from https://davedelong.com/blog/2020/06/30/http-in-swift-part-3-request-bodies/
     private func urlEncode(_ queryItem: URLQueryItem) -> String {
-        let value = urlEncode(queryItem.value ?? "")
+        let value = queryItem.value ?? ""
         return "\(queryItem.name)=\(value)"
     }
 
     private func urlEncode(_ string: String) -> String {
-        let allowedCharacters = CharacterSet.alphanumerics
+        var allowedCharacters = CharacterSet.alphanumerics
+        allowedCharacters.insert(".")
         return string.addingPercentEncoding(withAllowedCharacters: allowedCharacters) ?? ""
     }
 }
