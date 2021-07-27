@@ -20,7 +20,7 @@ class ViewController: UIViewController {
         scopes: [.openid, .profile, .webid, .offlineAccess],
         responseTypes:  [.code /* , .token */])
     var controller: SignInController!
-    var tokenRequest:TokenRequest!
+    var tokenRequest:TokenRequest<JWK_RSA>!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -79,7 +79,15 @@ class ViewController: UIViewController {
             return
         }
         
-        tokenRequest = TokenRequest(tokenEndpoint: tokenEndpoint, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId, jwk: keyPair.jwk, privateKey: keyPair.privateKey)
+        let jwk: JWK_RSA
+        do {
+            jwk = try JSONDecoder().decode(JWK_RSA.self, from: Data(keyPair.jwk.utf8))
+        } catch let error {
+            logger.error("Could not decode JWK: \(error)")
+            return
+        }
+        
+        tokenRequest = TokenRequest(tokenEndpoint: tokenEndpoint, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId, jwk: jwk, privateKey: keyPair.privateKey)
         tokenRequest.send { result in
             switch result {
             case .failure(let error):

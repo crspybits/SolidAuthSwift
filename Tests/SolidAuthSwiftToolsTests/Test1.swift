@@ -3,6 +3,9 @@ import XCTest
 import SwiftJWT
 import CryptorRSA
 
+// Run tests:
+//  swift test --enable-test-discovery --filter SolidAuthSwiftToolsTests
+
 final class SolidAuthSwiftToolsTests: XCTestCase {
     // The key pair setup using tshe method given here: https://github.com/Kitura/Swift-JWT
     // And transformed for json using: https://stackoverflow.com/questions/38672680/replace-newlines-with-literal-n/38674872
@@ -45,7 +48,15 @@ final class SolidAuthSwiftToolsTests: XCTestCase {
     }
     
     func testDPoPSigner() throws {
-        guard let jwk = keyPair?.jwk else {
+        guard let jwkString = keyPair?.jwk else {
+            XCTFail()
+            return
+        }
+        
+        let jwk: JWK_RSA
+        do {
+            jwk = try JSONDecoder().decode(JWK_RSA.self, from: Data(jwkString.utf8))
+        } catch let error {
             XCTFail()
             return
         }

@@ -66,11 +66,11 @@
       },
       {
         "package": "SwiftJWT",
-        "repositoryURL": "https://github.com/Kitura/Swift-JWT.git",
+        "repositoryURL": "https://github.com/crspybits/Swift-JWT.git",
         "state": {
-          "branch": null,
-          "revision": "2f2fc12ae88660e0760b04d9e6c341517b31ad7b",
-          "version": "3.6.200"
+          "branch": "master",
+          "revision": "4f048b1ca89af21bc0f065b0d7df4cd005d22ce0",
+          "version": null
         }
       },
       {

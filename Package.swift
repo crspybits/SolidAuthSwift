@@ -25,7 +25,9 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.4.2"),
         .package(url: "https://github.com/Flight-School/AnyCodable.git", from: "0.6.0"),
-        .package(name: "SwiftJWT", url: "https://github.com/Kitura/Swift-JWT.git", from: "3.6.200"),
+        
+        // Using my own forked copy of SwiftJWT-- because of a single method I needed to make public.
+        .package(name: "SwiftJWT", url: "https://github.com/crspybits/Swift-JWT.git", .branch("master")),
     ],
     targets: [
         .target(
@@ -33,7 +35,7 @@ let package = Package(
             dependencies: [
                 .product(name: "Logging", package: "swift-log"),
                 "AnyCodable",
-                "SolidAuthSwiftTools"
+                "SolidAuthSwiftTools",
             ],
             path: "Sources/SolidAuthSwiftUI"),
         .target(

@@ -34,7 +34,7 @@ body.client_id=https%3A%2F%2Fdecentphotos.example%2Fwebid%23this: The app’s cl
 
 // Subclass of NSObject for URLSessionDelegate conformance.
 
-public class TokenRequest: NSObject {
+public class TokenRequest<JWK: JWKCommon>: NSObject {
     enum TokenRequestError: Error {
         case couldNotConvertBodyToData
         case noHTTPURLResponse
@@ -57,10 +57,10 @@ public class TokenRequest: NSObject {
     let redirectUri: String
     let clientId: String
     let tokenEndpoint: URL
-    let jwk: String
+    let jwk: JWK
     let privateKey: String
     
-    public init(tokenEndpoint: URL, codeVerifier: String, code: String, redirectUri: String, clientId: String, jwk: String, privateKey: String) {
+    public init(tokenEndpoint: URL, codeVerifier: String, code: String, redirectUri: String, clientId: String, jwk: JWK, privateKey: String) {
         self.codeVerifier = codeVerifier
         self.code = code
         self.redirectUri = redirectUri
@@ -98,11 +98,11 @@ public class TokenRequest: NSObject {
         request.httpBody = bodyData
         
         request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "content-type")
-        request.addValue(dpopHeader, forHTTPHeaderField: DPoP.httpHeaderKey)
+        request.addValue(dpopHeader, forHTTPHeaderField: DPoPHttpHeaderKey)
         
-        print("request.allHTTPHeaderFields: \(request.allHTTPHeaderFields)")
+        // print("request.allHTTPHeaderFields: \(String(describing: request.allHTTPHeaderFields))")
 
-        let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: nil)
         session.dataTask(with: request, completionHandler: { data, response, error in
             if let error = error {
                 callCompletion(.failure(error))
@@ -115,10 +115,12 @@ public class TokenRequest: NSObject {
             }
             
             // DEBUGGING
+#if false
             if let data = data {
                 let str = String(data: data, encoding: .utf8)
                 print("String: \(String(describing: str))")
             }
+#endif
             // DEBUGGING
             
             guard NetworkingExtras.statusCodeOK(response.statusCode) else {
@@ -144,14 +146,6 @@ public class TokenRequest: NSObject {
     }
 
     func body() -> Data {
-//        let query = QueryUtilities()
-//        query.addParameter(Keys.grantType.rawValue, value: "authorization_code")
-//        query.addParameter(Keys.codeVerifier.rawValue, value: codeVerifier)
-//        query.addParameter(Keys.code.rawValue, value: code)
-//        query.addParameter(Keys.redirectUri.rawValue, value: redirectUri)
-//        query.addParameter(Keys.clientId.rawValue, value: clientId)
-//        return try query.urlEncodedParameters()
-        
         let values = [
             URLQueryItem(name: Keys.grantType.rawValue, value: "authorization_code"),
             URLQueryItem(name: Keys.codeVerifier.rawValue, value: codeVerifier),
@@ -162,7 +156,6 @@ public class TokenRequest: NSObject {
         
         let pieces = values.map(self.urlEncode)
         
-        // Without the "\n", I'm getting "Internal server error" in response to my request. At least on "https://solidcommunity.net"
         let bodyString = pieces.joined(separator: "&")
         
         print("Body: \(bodyString)")
@@ -183,6 +176,3 @@ public class TokenRequest: NSObject {
     }
 }
 
-extension TokenRequest: URLSessionDelegate {
-
-}
