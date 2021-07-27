@@ -56,6 +56,15 @@
         }
       },
       {
+        "package": "SolidAuthSwift",
+        "repositoryURL": "http://github.com/crspybits/SolidAuthSwift",
+        "state": {
+          "branch": "main",
+          "revision": "edfb902cd520422cf8c8ab08c8cd089e28e20113",
+          "version": null
+        }
+      },
+      {
         "package": "SwiftJWT",
         "repositoryURL": "https://github.com/Kitura/Swift-JWT.git",
         "state": {

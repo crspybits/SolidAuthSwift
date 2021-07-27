@@ -7,7 +7,10 @@
 
 import UIKit
 import SolidAuthSwiftUI
+import SolidAuthSwiftTools
 import Logging
+
+// Fails on registration request: https://broker.pod.inrupt.com
 
 class ViewController: UIViewController {
     let config = SignInConfiguration(
@@ -15,8 +18,9 @@ class ViewController: UIViewController {
         redirectURI: "biz.SpasticMuffin.Neebla.demo:/mypath",
         clientName: "Neebla",
         scopes: [.openid, .profile, .webid, .offlineAccess],
-        responseTypes:  [.code, .token])
+        responseTypes:  [.code /* , .token */])
     var controller: SignInController!
+    var tokenRequest:TokenRequest!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +40,52 @@ class ViewController: UIViewController {
                 
             case .success(let response):
                 logger.debug("**** Sign In Controller succeeded ****: \(response)")
+                self.requestTokens(response: response)
+            }
+        }
+    }
+    
+    // I'm planning to this request on the server, but it's easier for now to do a test on iOS.
+    func requestTokens(response: AuthorizationResponse) {
+        guard let tokenEndpoint = controller.providerConfig?.tokenEndpoint else {
+            logger.error("Could not get tokenEndpoint")
+            return
+        }
+        
+        guard let codeVerifier = controller?.auth?.request.codeVerifier else {
+            logger.error("Could not get codeVerifier")
+            return
+        }
+        
+        guard let code = response.authorizationCode else {
+            logger.error("Could not get code")
+            return
+        }
+        
+        guard let redirectURL = controller?.auth?.request.redirectURL else {
+            logger.error("Could not get redirectURL")
+            return
+        }
+        
+        guard let clientId = controller?.auth?.request.clientID else {
+            logger.error("Could not get clientID")
+            return
+        }
+
+        let keyPairFile = URL(fileURLWithPath: "/Users/chris/Developer/Private/SolidAuthSwiftTools/keyPair.json")
+        
+        guard let keyPair = try? KeyPair.loadFrom(file: keyPairFile) else {
+            logger.error("Could not load KeyPair")
+            return
+        }
+        
+        tokenRequest = TokenRequest(tokenEndpoint: tokenEndpoint, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId, jwk: keyPair.jwk, privateKey: keyPair.privateKey)
+        tokenRequest.send { result in
+            switch result {
+            case .failure(let error):
+                logger.error("Failed on TokenRequest: \(error)")
+            case .success(let response):
+                logger.debug("SUCCESS: On TokenRequest: \(String(describing: response.access_token))")
             }
         }
     }

@@ -4,6 +4,8 @@
 //  Created by Christopher G Prince on 7/24/21.
 //
 
+// Primarily for testing.
+
 import Foundation
 
 public class KeyPair: Codable {
@@ -17,5 +19,12 @@ public class KeyPair: Codable {
         self.publicKey = publicKey
         self.privateKey = privateKey
         self.jwk = jwk
+    }
+}
+
+extension KeyPair {
+    public static func loadFrom(file: URL) throws -> KeyPair {
+        let data = try Data(contentsOf: file)
+        return try JSONDecoder().decode(KeyPair.self, from: data)
     }
 }

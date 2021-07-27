@@ -8,6 +8,7 @@
 
 import UIKit
 import AuthenticationServices
+import SolidAuthSwiftTools
 
 fileprivate let kGrantTypeAuthorizationCode = "authorization_code"
 
@@ -22,7 +23,7 @@ public class Authorization: NSObject {
         case couldNotGetURLWithoutQuery
     }
     
-    let request: AuthorizationRequest
+    public let request: AuthorizationRequest
     var presentationContextProvider: ASWebAuthenticationPresentationContextProviding?
     var completion: ((Result<AuthorizationResponse, Error>) -> Void)!
     var queue: DispatchQueue!

@@ -8,6 +8,7 @@
 
 import Foundation
 import AnyCodable
+import SolidAuthSwiftTools
 
 fileprivate let kResponseTypeKey = "response_type"
 fileprivate let kClientIDKey = "client_id"
@@ -43,7 +44,7 @@ public class AuthorizationRequest: NSObject, Codable  {
      @remarks client_id
      @see https://tools.ietf.org/html/rfc6749#section-2.2
      */
-    let clientID: String
+    public let clientID: String
     /*! @brief The client secret.
      @remarks client_secret
      @discussion The client secret is used to prove that identity of the client when exchaning an
@@ -63,7 +64,7 @@ public class AuthorizationRequest: NSObject, Codable  {
      @remarks redirect_uri
      @see https://tools.ietf.org/html/rfc6749#section-3.1.2
      */
-    let redirectURL: URL
+    public let redirectURL: URL
     
     //  The converted code is limited to 2 KB.
     //  Upgrade your plan to remove this limitation.
@@ -96,7 +97,7 @@ public class AuthorizationRequest: NSObject, Codable  {
      includes this parameter automatically.
      @see https://tools.ietf.org/html/rfc7636#section-4.1
      */
-    let codeVerifier: String?
+    public let codeVerifier: String?
     /*! @brief The PKCE code challenge, derived from #codeVerifier.
      @remarks code_challenge
      @see https://tools.ietf.org/html/rfc7636#section-4.2

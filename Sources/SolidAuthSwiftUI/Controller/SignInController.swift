@@ -22,7 +22,8 @@ public class SignInController {
     let config: SignInConfiguration
     
     var request:RegistrationRequest!
-    var auth:Authorization!
+    public var auth:Authorization!
+    public var providerConfig: ProviderConfiguration!
     var completion: ((Result<AuthorizationResponse, Error>)-> Void)!
     var queue: DispatchQueue!
     
@@ -65,6 +66,7 @@ public class SignInController {
                 self.callCompletion(.failure(error))
                 
             case .success(let config):
+                self.providerConfig = config
                 self.registerClient(config: config)
             }
         }
@@ -84,7 +86,7 @@ public class SignInController {
             
             switch result {
             case .failure(let error):
-                logger.error("Failed client regisration: \(error)")
+                logger.error("Failed client registration: \(error)")
                 self.callCompletion(.failure(error))
                 
             case .success(let response):

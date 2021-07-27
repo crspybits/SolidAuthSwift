@@ -38,6 +38,16 @@
                ReferencedContainer = "container:../SolidAuthSwift">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SolidAuthSwiftUITests"
+               BuildableName = "SolidAuthSwiftUITests"
+               BlueprintName = "SolidAuthSwiftUITests"
+               ReferencedContainer = "container:../..">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
