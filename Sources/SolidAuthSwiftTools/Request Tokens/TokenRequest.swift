@@ -10,27 +10,8 @@ import Foundation
     import FoundationNetworking
 #endif
 
+// grant_type=authorization_code
 // See https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-14
-/*
-POST https://secureauth.example/token
-Headers: {
-  "DPoP": "eyJhbGciOiJFUzI1NiIsInR5cCI6ImRwb3Arand0IiwiandrIjp7Imt0eSI6IkVDIiwia2lkIjoiZkJ1STExTkdGbTQ4Vlp6RzNGMjVDOVJmMXYtaGdEakVnV2pEQ1BrdV9pVSIsInVzZSI6InNpZyIsImFsZyI6IkVDIiwiY3J2IjoiUC0yNTYiLCJ4IjoiOWxlT2gxeF9IWkhzVkNScDcyQzVpR01jek1nUnpDUFBjNjBoWldfSFlLMCIsInkiOiJqOVVYcnRjUzRLVzBIYmVteW1vRWlMXzZ1cko0TFFHZXJQZXVNaFNEaV80In19.eyJodHUiOiJodHRwczovL3NlY3VyZWF1dGguZXhhbXBsZS90b2tlbiIsImh0bSI6InBvc3QiLCJqdGkiOiI0YmEzZTllZi1lOThkLTQ2NDQtOTg3OC03MTYwZmE3ZDNlYjgiLCJpYXQiOjE2MDMzMDYxMjgsImV4cCI6MTYwMzMwOTcyOH0.2lbgLoRCkj0MsDc9BpquoaYuq0-XwRf_URdXru2JKrVzaWUqQfyKRK76_sQ0aJyVwavM3pPswLlHq2r9032O7Q",
-  "content-type": "application/x-www-form-urlencoded"
-}
-Body:
-  grant_type=authorization_code&
-  code_verifier=JXPOuToEB7&
-  code=m-OrTPHdRsm8W_e9P0J2Bt&
-  redirect_uri=https%3A%2F%2Fdecentphotos.example%2Fcallback&
-  client_id=https%3A%2F%2Fdecentphotos.example%2Fwebid%23this
-headers.DPoP: "eyJhbGciOiJFUz...": The DPoP token we generated before. This will tell the OP what the client’s public key is.
-headers.content-type: "application/x-www-form-urlencoded": Sets to body’s content type to application/x-www-form-urlencoded. Some OPs will accept other content types like application/json but they all must access urlencoded content types, so it’s safest to use that.
-body.grant_type=authorization_code: Tells the OP that we are doing the authorization code flow.
-body.code_verifier=JXPOuToEB7: Our code verifier that we stored in session storage
-body.code=m-OrTPHdRsm8W_e9P0J2Bt: The code that we received from the OP upon redirect
-body.redirect_uri: The app’s redirect url. In this case, this isn’t needed because we’re doing an AJAX request.
-body.client_id=https%3A%2F%2Fdecentphotos.example%2Fwebid%23this: The app’s client id.
- */
 
 // Subclass of NSObject for URLSessionDelegate conformance.
 
@@ -52,20 +33,17 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
         case clientId = "client_id"
     }
     
-    let codeVerifier: String
-    let code: String
-    let redirectUri: String
-    let clientId: String
-    let tokenEndpoint: URL
+    enum Values: String {
+        case authorizationCode = "authorization_code"
+        case refreshToken = "refresh_token"
+    }
+    
+    let parameters: TokenRequestParameters
     let jwk: JWK
     let privateKey: String
     
-    public init(tokenEndpoint: URL, codeVerifier: String, code: String, redirectUri: String, clientId: String, jwk: JWK, privateKey: String) {
-        self.codeVerifier = codeVerifier
-        self.code = code
-        self.redirectUri = redirectUri
-        self.clientId = clientId
-        self.tokenEndpoint = tokenEndpoint
+    public init(parameters: TokenRequestParameters, jwk: JWK, privateKey: String) {
+        self.parameters = parameters
         self.jwk = jwk
         self.privateKey = privateKey
     }
@@ -79,7 +57,7 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
         }
         
         let httpMethod = "POST"
-        let bodyClaims = BodyClaims(htu: tokenEndpoint.absoluteString, htm: httpMethod, jti: UUID().uuidString)
+        let bodyClaims = BodyClaims(htu: parameters.tokenEndpoint.absoluteString, htm: httpMethod, jti: UUID().uuidString)
         let dpop = DPoP(jwk: jwk, privateKey: privateKey, body: bodyClaims)
         
         let dpopHeader: String
@@ -93,7 +71,7 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
 
         let bodyData = self.body()
         
-        var request = URLRequest(url: tokenEndpoint)
+        var request = URLRequest(url: parameters.tokenEndpoint)
         request.httpMethod = httpMethod
         request.httpBody = bodyData
         
@@ -148,10 +126,10 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
     func body() -> Data {
         let values = [
             URLQueryItem(name: Keys.grantType.rawValue, value: "authorization_code"),
-            URLQueryItem(name: Keys.codeVerifier.rawValue, value: codeVerifier),
-            URLQueryItem(name: Keys.code.rawValue, value: code),
-            URLQueryItem(name: Keys.redirectUri.rawValue, value: redirectUri),
-            URLQueryItem(name: Keys.clientId.rawValue, value: clientId),
+            URLQueryItem(name: Keys.codeVerifier.rawValue, value: parameters.codeVerifier),
+            URLQueryItem(name: Keys.code.rawValue, value: parameters.code),
+            URLQueryItem(name: Keys.redirectUri.rawValue, value: parameters.redirectUri),
+            URLQueryItem(name: Keys.clientId.rawValue, value: parameters.clientId),
         ]
         
         let pieces = values.map(self.urlEncode)

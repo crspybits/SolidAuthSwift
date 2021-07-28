@@ -6,15 +6,22 @@
 //
 
 import Foundation
+import SolidAuthSwiftTools
 
-// The purpose of this class is to present a Pod sign in UI to the user, and to generate a `AuthorizationResponse`.
+// The purpose of this class is to present a Pod sign in UI to the user, and to generate a `SignInController.Response`.
 // After that, if in the `SignInConfiguration` you ask for a .code response type, you might pass the resulting `code` to your server to complete the flow from step 12 onwards-- see https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-12
 // See also https://forum.solidproject.org/t/both-client-and-server-accessing-a-pod/4511/6
 
 public class SignInController {
+    public struct Response {
+        public let authResponse: AuthorizationResponse
+        public let parameters: TokenRequestParameters
+    }
+    
     enum ControllerError: Error {
         case badRedirectURIString
         case noClientId
+        case generateParameters(String)
     }
     
     let authConfig: AuthorizationConfiguration
@@ -24,7 +31,7 @@ public class SignInController {
     var request:RegistrationRequest!
     public var auth:Authorization!
     public var providerConfig: ProviderConfiguration!
-    var completion: ((Result<AuthorizationResponse, Error>)-> Void)!
+    var completion: ((Result<SignInController.Response, Error>)-> Void)!
     var queue: DispatchQueue!
     
     // Retain the instance you make, before calling `start`, because this class does async operations.
@@ -44,13 +51,13 @@ public class SignInController {
         2) Client registration
         3) Authorization request
     */
-    public func start(queue: DispatchQueue = .main, completion: @escaping (Result<AuthorizationResponse, Error>)-> Void) {
+    public func start(queue: DispatchQueue = .main, completion: @escaping (Result<SignInController.Response, Error>)-> Void) {
         self.completion = completion
         self.queue = queue
         fetchConfiguration()
     }
     
-    func callCompletion(_ result: Result<AuthorizationResponse, Error>) {
+    func callCompletion(_ result: Result<SignInController.Response, Error>) {
         queue.async { [weak self] in
             self?.completion(result)
         }
@@ -124,8 +131,38 @@ public class SignInController {
                 self.callCompletion(.failure(error))
                 
             case .success(let response):
-                self.callCompletion(.success(response))
+                do {
+                    let params = try self.prepRequestParameters(response: response)
+                    let result = Response(authResponse: response, parameters: params)
+                    self.callCompletion(.success(result))
+                } catch let error {
+                    self.callCompletion(.failure(error))
+                }
             }
         }
+    }
+    
+    func prepRequestParameters(response: AuthorizationResponse) throws -> TokenRequestParameters {
+        guard let tokenEndpoint = providerConfig?.tokenEndpoint else {
+            throw ControllerError.generateParameters("Could not get tokenEndpoint")
+        }
+        
+        guard let codeVerifier = auth?.request.codeVerifier else {
+            throw ControllerError.generateParameters("Could not get codeVerifier")
+        }
+        
+        guard let code = response.authorizationCode else {
+            throw ControllerError.generateParameters("Could not get code")
+        }
+        
+        guard let redirectURL = auth?.request.redirectURL else {
+            throw ControllerError.generateParameters("Could not get redirectURL")
+        }
+        
+        guard let clientId = auth?.request.clientID else {
+            throw ControllerError.generateParameters("Could not get clientID")
+        }
+        
+        return TokenRequestParameters(tokenEndpoint: tokenEndpoint, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId)
     }
 }

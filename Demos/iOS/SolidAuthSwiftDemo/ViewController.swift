@@ -10,6 +10,8 @@ import SolidAuthSwiftUI
 import SolidAuthSwiftTools
 import Logging
 
+let keyPairPath = "/Users/chris/Developer/Private/SolidAuthSwiftTools/keyPair.json"
+
 // Fails on registration request: https://broker.pod.inrupt.com
 
 class ViewController: UIViewController {
@@ -40,39 +42,14 @@ class ViewController: UIViewController {
                 
             case .success(let response):
                 logger.debug("**** Sign In Controller succeeded ****: \(response)")
-                self.requestTokens(response: response)
+                self.requestTokens(params: response.parameters)
             }
         }
     }
     
-    // I'm planning to this request on the server, but it's easier for now to do a test on iOS.
-    func requestTokens(response: AuthorizationResponse) {
-        guard let tokenEndpoint = controller.providerConfig?.tokenEndpoint else {
-            logger.error("Could not get tokenEndpoint")
-            return
-        }
-        
-        guard let codeVerifier = controller?.auth?.request.codeVerifier else {
-            logger.error("Could not get codeVerifier")
-            return
-        }
-        
-        guard let code = response.authorizationCode else {
-            logger.error("Could not get code")
-            return
-        }
-        
-        guard let redirectURL = controller?.auth?.request.redirectURL else {
-            logger.error("Could not get redirectURL")
-            return
-        }
-        
-        guard let clientId = controller?.auth?.request.clientID else {
-            logger.error("Could not get clientID")
-            return
-        }
-
-        let keyPairFile = URL(fileURLWithPath: "/Users/chris/Developer/Private/SolidAuthSwiftTools/keyPair.json")
+    // I'm planning to do this request on the server: Because I don't want to have the encryption private key on the iOS client. But it's easier for now to do a test on iOS.
+    func requestTokens(params:TokenRequestParameters) {
+        let keyPairFile = URL(fileURLWithPath: keyPairPath)
         
         guard let keyPair = try? KeyPair.loadFrom(file: keyPairFile) else {
             logger.error("Could not load KeyPair")
@@ -87,7 +64,7 @@ class ViewController: UIViewController {
             return
         }
         
-        tokenRequest = TokenRequest(tokenEndpoint: tokenEndpoint, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId, jwk: jwk, privateKey: keyPair.privateKey)
+        tokenRequest = TokenRequest(parameters: params, jwk: jwk, privateKey: keyPair.privateKey)
         tokenRequest.send { result in
             switch result {
             case .failure(let error):
