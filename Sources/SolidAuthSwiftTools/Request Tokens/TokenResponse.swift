@@ -24,3 +24,14 @@ public class TokenResponse: Codable {
     public var refresh_token: String!
     public var scope: String!
 }
+
+extension TokenResponse {
+    // Only suitable for use when the TokenRequest that generated the TokenResponse used a .code
+    public func createRefreshParameters(tokenEndpoint: URL, clientId: String) -> RefreshParameters? {
+        guard let refresh_token = refresh_token else {
+            return nil
+        }
+        
+        return RefreshParameters(tokenEndpoint: tokenEndpoint, refreshToken: refresh_token, clientId: clientId)
+    }
+}

@@ -15,7 +15,7 @@ import SolidAuthSwiftTools
 public class SignInController {
     public struct Response {
         public let authResponse: AuthorizationResponse
-        public let parameters: TokenRequestParameters
+        public let parameters: CodeParameters
     }
     
     enum ControllerError: Error {
@@ -142,9 +142,13 @@ public class SignInController {
         }
     }
     
-    func prepRequestParameters(response: AuthorizationResponse) throws -> TokenRequestParameters {
+    func prepRequestParameters(response: AuthorizationResponse) throws -> CodeParameters {
         guard let tokenEndpoint = providerConfig?.tokenEndpoint else {
             throw ControllerError.generateParameters("Could not get tokenEndpoint")
+        }
+ 
+        guard let jwksURL = providerConfig?.jwksURL else {
+            throw ControllerError.generateParameters("Could not get jwksURL")
         }
         
         guard let codeVerifier = auth?.request.codeVerifier else {
@@ -163,6 +167,6 @@ public class SignInController {
             throw ControllerError.generateParameters("Could not get clientID")
         }
         
-        return TokenRequestParameters(tokenEndpoint: tokenEndpoint, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId)
+        return CodeParameters(tokenEndpoint: tokenEndpoint, jwksURL: jwksURL, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId)
     }
 }

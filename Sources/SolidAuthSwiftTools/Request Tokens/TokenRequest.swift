@@ -13,6 +13,9 @@ import Foundation
 // grant_type=authorization_code
 // See https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-14
 
+// grant_type=refresh_token
+// See https://datatracker.ietf.org/doc/html/draft-ietf-oauth-dpop
+
 // Subclass of NSObject for URLSessionDelegate conformance.
 
 public class TokenRequest<JWK: JWKCommon>: NSObject {
@@ -27,22 +30,19 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
     
     enum Keys: String {
         case grantType = "grant_type"
+        case refreshToken = "refresh_token"
         case codeVerifier = "code_verifier"
         case code
         case redirectUri = "redirect_uri"
         case clientId = "client_id"
     }
     
-    enum Values: String {
-        case authorizationCode = "authorization_code"
-        case refreshToken = "refresh_token"
-    }
-    
-    let parameters: TokenRequestParameters
+    let parameters: TokenRequestType
     let jwk: JWK
     let privateKey: String
     
-    public init(parameters: TokenRequestParameters, jwk: JWK, privateKey: String) {
+    // You should first make a .code request and then as needed with the resulting refresh token, do .refresh requests when the access token expires.
+    public init(parameters: TokenRequestType, jwk: JWK, privateKey: String) {
         self.parameters = parameters
         self.jwk = jwk
         self.privateKey = privateKey
@@ -57,7 +57,7 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
         }
         
         let httpMethod = "POST"
-        let bodyClaims = BodyClaims(htu: parameters.tokenEndpoint.absoluteString, htm: httpMethod, jti: UUID().uuidString)
+        let bodyClaims = BodyClaims(htu: parameters.basics.tokenEndpoint.absoluteString, htm: httpMethod, jti: UUID().uuidString)
         let dpop = DPoP(jwk: jwk, privateKey: privateKey, body: bodyClaims)
         
         let dpopHeader: String
@@ -71,7 +71,7 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
 
         let bodyData = self.body()
         
-        var request = URLRequest(url: parameters.tokenEndpoint)
+        var request = URLRequest(url: parameters.basics.tokenEndpoint)
         request.httpMethod = httpMethod
         request.httpBody = bodyData
         
@@ -93,12 +93,12 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
             }
             
             // DEBUGGING
-#if false
+//#if false
             if let data = data {
                 let str = String(data: data, encoding: .utf8)
                 print("String: \(String(describing: str))")
             }
-#endif
+//#endif
             // DEBUGGING
             
             guard NetworkingExtras.statusCodeOK(response.statusCode) else {
@@ -124,14 +124,30 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
     }
 
     func body() -> Data {
-        let values = [
-            URLQueryItem(name: Keys.grantType.rawValue, value: "authorization_code"),
-            URLQueryItem(name: Keys.codeVerifier.rawValue, value: parameters.codeVerifier),
-            URLQueryItem(name: Keys.code.rawValue, value: parameters.code),
-            URLQueryItem(name: Keys.redirectUri.rawValue, value: parameters.redirectUri),
-            URLQueryItem(name: Keys.clientId.rawValue, value: parameters.clientId),
+        var values = [URLQueryItem]()
+
+        values += [
+            URLQueryItem(name: Keys.grantType.rawValue, value: parameters.basics.grantType),
         ]
         
+        switch parameters {
+        case .code(let code):
+            values += [
+                URLQueryItem(name: Keys.codeVerifier.rawValue, value: code.codeVerifier),
+                URLQueryItem(name: Keys.code.rawValue, value: code.code),
+                URLQueryItem(name: Keys.redirectUri.rawValue, value: code.redirectUri),
+            ]
+        case .refresh(let refresh):
+            values += [
+                URLQueryItem(name: Keys.refreshToken.rawValue, value: refresh.refreshToken),
+            ]
+        }
+
+        // Common body parameters
+        values += [
+            URLQueryItem(name: Keys.clientId.rawValue, value: parameters.basics.clientId),
+        ]
+            
         let pieces = values.map(self.urlEncode)
         
         let bodyString = pieces.joined(separator: "&")
