@@ -28,6 +28,9 @@ let package = Package(
         
         // Using my own forked copy of SwiftJWT-- because of a single method I needed to make public.
         .package(name: "SwiftJWT", url: "https://github.com/crspybits/Swift-JWT.git", .branch("master")),
+        
+        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0")
+        
     ],
     targets: [
         .target(
@@ -43,6 +46,7 @@ let package = Package(
             dependencies: [
                 "SwiftJWT",
                 "AnyCodable",
+                .product(name: "JWTKit", package: "jwt-kit"),
             ],
             path: "Sources/SolidAuthSwiftTools"),
             

@@ -1,35 +1,26 @@
 //
-//  ViewController.swift
+//  Server.swift
 //  SolidAuthSwiftDemo
 //
-//  Created by Christopher G Prince on 7/24/21.
+//  Created by Christopher G Prince on 7/28/21.
 //
 
-import UIKit
+import Foundation
 import SolidAuthSwiftUI
 import SolidAuthSwiftTools
 import Logging
 
 let keyPairPath = "/Users/chris/Developer/Private/SolidAuthSwiftTools/keyPair.json"
 
-// Fails on registration request: https://broker.pod.inrupt.com
-
-class ViewController: UIViewController {
-    let config = SignInConfiguration(
-        issuer: "https://solidcommunity.net",
-        redirectURI: "biz.SpasticMuffin.Neebla.demo:/mypath",
-        clientName: "Neebla",
-        scopes: [.openid, .profile, .webid, .offlineAccess],
-        responseTypes:  [.code /* , .token */])
-    var controller: SignInController!
-    var tokenRequest1:TokenRequest<JWK_RSA>!
-    var tokenRequest2:TokenRequest<JWK_RSA>!
+class Server: ObservableObject {
     var jwk: JWK_RSA!
     var keyPair: KeyPair!
+    var tokenRequest:TokenRequest<JWK_RSA>!
+    @Published var refreshParams: RefreshParameters?
+    var jwksRequest: JwksRequest!
+    var tokenResponse: TokenResponse!
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
+    init() {
         let keyPairFile = URL(fileURLWithPath: keyPairPath)
         
         guard let keyPair = try? KeyPair.loadFrom(file: keyPairFile) else {
@@ -43,55 +34,36 @@ class ViewController: UIViewController {
         } catch let error {
             logger.error("Could not decode JWK: \(error)")
             return
-        }
-        
-        guard let controller = try? SignInController(config: config) else {
-            logger.error("Could not initialize Controller")
-            return
-        }
-        
-        // Retain the controller because it does async operations.
-        self.controller = controller
-        
-        controller.start() { result in
-            switch result {
-            case .failure(let error):
-                logger.error("Sign In Controller failed: \(error)")
-                
-            case .success(let response):
-                logger.debug("**** Sign In Controller succeeded ****: \(response)")
-                self.requestTokens(params: response.parameters)
-            }
-        }
+        }    
     }
     
     // I'm planning to do this request on the server: Because I don't want to have the encryption private key on the iOS client. But it's easier for now to do a test on iOS.
     func requestTokens(params:CodeParameters) {
-        tokenRequest1 = TokenRequest(parameters: .code(params), jwk: jwk, privateKey: keyPair.privateKey)
-        tokenRequest1.send { result in
+        tokenRequest = TokenRequest(parameters: .code(params), jwk: jwk, privateKey: keyPair.privateKey)
+        tokenRequest.send { result in
             switch result {
             case .failure(let error):
                 logger.error("Failed on TokenRequest: \(error)")
             case .success(let response):
                 assert(response.access_token != nil)
                 assert(response.refresh_token != nil)
-
+                self.tokenResponse = response
+                
                 logger.debug("SUCCESS: On TokenRequest")
                 
                 guard let refreshParams = response.createRefreshParameters(tokenEndpoint: params.tokenEndpoint, clientId: params.clientId) else {
                     logger.error("ERROR: Failed to create refresh parameters")
                     return
                 }
-                
-                self.refreshTokens(params: refreshParams)
+                self.refreshParams = refreshParams
             }
         }
     }
     
     // Again, this is just a test, and I intend it to be carried out on the server-- to refresh an expired access token.
     func refreshTokens(params: RefreshParameters) {
-        tokenRequest2 = TokenRequest(parameters: .refresh(params), jwk: jwk, privateKey: keyPair.privateKey)
-        tokenRequest2.send { result in
+        tokenRequest = TokenRequest(parameters: .refresh(params), jwk: jwk, privateKey: keyPair.privateKey)
+        tokenRequest.send { result in
             switch result {
             case .failure(let error):
                 logger.error("Failed on Refresh TokenRequest: \(error)")
@@ -99,6 +71,40 @@ class ViewController: UIViewController {
                 assert(response.access_token != nil)
                 
                 logger.debug("SUCCESS: On Refresh TokenRequest")
+            }
+        }
+    }
+    
+    func jwksRequest(jwksURL: URL) {
+        jwksRequest = JwksRequest(jwksURL: jwksURL)
+        jwksRequest.send { result in
+            switch result {
+            case .failure(let error):
+                logger.error("JwksRequest: \(error)")
+            case .success(let response):
+                guard let tokenResponse = self.tokenResponse,
+                    let accessTokenString = tokenResponse.access_token else {
+                    logger.error("Could not get token response or access token")
+                    return
+                }
+                
+                // logger.debug("JwksRequest: \(response.jwks.keys)")
+                
+                let accessToken:AccessToken
+                
+                do {
+                    accessToken = try AccessToken(jwks: response.jwks, accessToken: accessTokenString)
+                } catch let error {
+                    logger.error("Failed validating access token: \(error)")
+                    return
+                }
+                
+                guard accessToken.validateClaims() == .success else {
+                    logger.error("Failed validating access token claims")
+                    return
+                }
+                
+                logger.debug("SUCCESS: validated access token!")
             }
         }
     }

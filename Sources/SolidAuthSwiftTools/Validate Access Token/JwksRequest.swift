@@ -6,8 +6,12 @@
 //
 
 import Foundation
+import JWTKit
 
-public struct JwksRequest {
+// See jwks_uri in https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+// and https://datatracker.ietf.org/doc/html/draft-ietf-jose-json-web-key
+
+public class JwksRequest {
     enum JwksRequestError: Error {
         case noHTTPURLResponse
         case badStatusCode(Int)
@@ -53,15 +57,18 @@ public struct JwksRequest {
                 return
             }
             
-            let jwksResponse: JwksResponse
+            // let string = String(data: data, encoding: .utf8)
+            // print("jwksResponse: \(String(describing: string))")
+            
+            let jwks: JWKS
             do {
-                jwksResponse = try JSONDecoder().decode(JwksResponse.self, from: data)
+                jwks = try JSONDecoder().decode(JWKS.self, from: data)
             } catch let error {
                 callCompletion(.failure(error))
                 return
             }
-            
-            callCompletion(.success(jwksResponse))
+
+            callCompletion(.success(JwksResponse(jwks: jwks)))
         }).resume()
     }
 }

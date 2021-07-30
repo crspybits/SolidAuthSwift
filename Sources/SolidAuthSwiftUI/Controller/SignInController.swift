@@ -13,7 +13,7 @@ import SolidAuthSwiftTools
 // See also https://forum.solidproject.org/t/both-client-and-server-accessing-a-pod/4511/6
 
 public class SignInController {
-    public struct Response {
+    public struct Response: Codable {
         public let authResponse: AuthorizationResponse
         public let parameters: CodeParameters
     }

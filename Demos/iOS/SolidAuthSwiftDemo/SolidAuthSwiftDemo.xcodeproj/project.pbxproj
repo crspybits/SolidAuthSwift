@@ -7,74 +7,92 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		837B82F726AD0DCB00936600 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837B82F626AD0DCB00936600 /* AppDelegate.swift */; };
-		837B82F926AD0DCC00936600 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837B82F826AD0DCC00936600 /* SceneDelegate.swift */; };
-		837B82FB26AD0DCC00936600 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837B82FA26AD0DCC00936600 /* ViewController.swift */; };
-		837B82FE26AD0DCC00936600 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 837B82FC26AD0DCC00936600 /* Main.storyboard */; };
-		837B830026AD0DCD00936600 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 837B82FF26AD0DCD00936600 /* Assets.xcassets */; };
-		837B830326AD0DCD00936600 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 837B830126AD0DCD00936600 /* LaunchScreen.storyboard */; };
-		837B830E26AD106D00936600 /* SolidAuthSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 837B830D26AD106D00936600 /* SolidAuthSwiftUI */; };
+		837B8A6D26B1312300936600 /* SolidAuthSwiftDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837B8A6C26B1312300936600 /* SolidAuthSwiftDemoApp.swift */; };
+		837B8A6F26B1312300936600 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837B8A6E26B1312300936600 /* ContentView.swift */; };
+		837B8A7126B1312500936600 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 837B8A7026B1312500936600 /* Assets.xcassets */; };
+		837B8A7426B1312500936600 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 837B8A7326B1312500936600 /* Preview Assets.xcassets */; };
+		837B8A7D26B1325E00936600 /* SolidAuthSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 837B8A7C26B1325E00936600 /* SolidAuthSwiftUI */; };
+		837B8A8026B1330700936600 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837B8A7F26B1330700936600 /* Client.swift */; };
+		837B8A8226B1331300936600 /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 837B8A8126B1331300936600 /* Server.swift */; };
+		837B8A8526B1349F00936600 /* PersistentValue in Frameworks */ = {isa = PBXBuildFile; productRef = 837B8A8426B1349F00936600 /* PersistentValue */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		837B82F326AD0DCB00936600 /* SolidAuthSwiftDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SolidAuthSwiftDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		837B82F626AD0DCB00936600 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		837B82F826AD0DCC00936600 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		837B82FA26AD0DCC00936600 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		837B82FD26AD0DCC00936600 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		837B82FF26AD0DCD00936600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		837B830226AD0DCD00936600 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		837B830426AD0DCD00936600 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		837B8A5F26AE47C800936600 /* SolidAuthSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SolidAuthSwift; path = ../..; sourceTree = "<group>"; };
+		837B8A6926B1312300936600 /* SolidAuthSwiftDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SolidAuthSwiftDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		837B8A6C26B1312300936600 /* SolidAuthSwiftDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolidAuthSwiftDemoApp.swift; sourceTree = "<group>"; };
+		837B8A6E26B1312300936600 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		837B8A7026B1312500936600 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		837B8A7326B1312500936600 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		837B8A7526B1312500936600 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		837B8A7F26B1330700936600 /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
+		837B8A8126B1331300936600 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
+		837B8A8826B1377F00936600 /* SolidAuthSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SolidAuthSwift; path = ../../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		837B82F026AD0DCB00936600 /* Frameworks */ = {
+		837B8A6626B1312300936600 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				837B830E26AD106D00936600 /* SolidAuthSwiftUI in Frameworks */,
+				837B8A7D26B1325E00936600 /* SolidAuthSwiftUI in Frameworks */,
+				837B8A8526B1349F00936600 /* PersistentValue in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		837B82EA26AD0DCB00936600 = {
+		837B8A6026B1312300936600 = {
 			isa = PBXGroup;
 			children = (
-				837B830A26AD0DD400936600 /* Local Packages */,
-				837B82F526AD0DCB00936600 /* SolidAuthSwiftDemo */,
-				837B82F426AD0DCB00936600 /* Products */,
+				837B8A8726B1375F00936600 /* Local Packages */,
+				837B8A6B26B1312300936600 /* SolidAuthSwiftDemo */,
+				837B8A6A26B1312300936600 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		837B82F426AD0DCB00936600 /* Products */ = {
+		837B8A6A26B1312300936600 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				837B82F326AD0DCB00936600 /* SolidAuthSwiftDemo.app */,
+				837B8A6926B1312300936600 /* SolidAuthSwiftDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		837B82F526AD0DCB00936600 /* SolidAuthSwiftDemo */ = {
+		837B8A6B26B1312300936600 /* SolidAuthSwiftDemo */ = {
 			isa = PBXGroup;
 			children = (
-				837B82F626AD0DCB00936600 /* AppDelegate.swift */,
-				837B82F826AD0DCC00936600 /* SceneDelegate.swift */,
-				837B82FA26AD0DCC00936600 /* ViewController.swift */,
-				837B82FC26AD0DCC00936600 /* Main.storyboard */,
-				837B82FF26AD0DCD00936600 /* Assets.xcassets */,
-				837B830126AD0DCD00936600 /* LaunchScreen.storyboard */,
-				837B830426AD0DCD00936600 /* Info.plist */,
+				837B8A6C26B1312300936600 /* SolidAuthSwiftDemoApp.swift */,
+				837B8A6E26B1312300936600 /* ContentView.swift */,
+				837B8A7E26B132F300936600 /* SolidAuth */,
+				837B8A7026B1312500936600 /* Assets.xcassets */,
+				837B8A7526B1312500936600 /* Info.plist */,
+				837B8A7226B1312500936600 /* Preview Content */,
 			);
 			path = SolidAuthSwiftDemo;
 			sourceTree = "<group>";
 		};
-		837B830A26AD0DD400936600 /* Local Packages */ = {
+		837B8A7226B1312500936600 /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				837B8A5F26AE47C800936600 /* SolidAuthSwift */,
+				837B8A7326B1312500936600 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		837B8A7E26B132F300936600 /* SolidAuth */ = {
+			isa = PBXGroup;
+			children = (
+				837B8A7F26B1330700936600 /* Client.swift */,
+				837B8A8126B1331300936600 /* Server.swift */,
+			);
+			path = SolidAuth;
+			sourceTree = "<group>";
+		};
+		837B8A8726B1375F00936600 /* Local Packages */ = {
+			isa = PBXGroup;
+			children = (
+				837B8A8826B1377F00936600 /* SolidAuthSwift */,
 			);
 			name = "Local Packages";
 			sourceTree = "<group>";
@@ -82,13 +100,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		837B82F226AD0DCB00936600 /* SolidAuthSwiftDemo */ = {
+		837B8A6826B1312300936600 /* SolidAuthSwiftDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 837B830726AD0DCD00936600 /* Build configuration list for PBXNativeTarget "SolidAuthSwiftDemo" */;
+			buildConfigurationList = 837B8A7826B1312500936600 /* Build configuration list for PBXNativeTarget "SolidAuthSwiftDemo" */;
 			buildPhases = (
-				837B82EF26AD0DCB00936600 /* Sources */,
-				837B82F026AD0DCB00936600 /* Frameworks */,
-				837B82F126AD0DCB00936600 /* Resources */,
+				837B8A6526B1312300936600 /* Sources */,
+				837B8A6626B1312300936600 /* Frameworks */,
+				837B8A6726B1312300936600 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -96,27 +114,28 @@
 			);
 			name = SolidAuthSwiftDemo;
 			packageProductDependencies = (
-				837B830D26AD106D00936600 /* SolidAuthSwiftUI */,
+				837B8A7C26B1325E00936600 /* SolidAuthSwiftUI */,
+				837B8A8426B1349F00936600 /* PersistentValue */,
 			);
 			productName = SolidAuthSwiftDemo;
-			productReference = 837B82F326AD0DCB00936600 /* SolidAuthSwiftDemo.app */;
+			productReference = 837B8A6926B1312300936600 /* SolidAuthSwiftDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		837B82EB26AD0DCB00936600 /* Project object */ = {
+		837B8A6126B1312300936600 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1250;
 				LastUpgradeCheck = 1250;
 				TargetAttributes = {
-					837B82F226AD0DCB00936600 = {
+					837B8A6826B1312300936600 = {
 						CreatedOnToolsVersion = 12.5;
 					};
 				};
 			};
-			buildConfigurationList = 837B82EE26AD0DCB00936600 /* Build configuration list for PBXProject "SolidAuthSwiftDemo" */;
+			buildConfigurationList = 837B8A6426B1312300936600 /* Build configuration list for PBXProject "SolidAuthSwiftDemo" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -124,66 +143,48 @@
 				en,
 				Base,
 			);
-			mainGroup = 837B82EA26AD0DCB00936600;
+			mainGroup = 837B8A6026B1312300936600;
 			packageReferences = (
-				837B830C26AD106D00936600 /* XCRemoteSwiftPackageReference "SolidAuthSwift" */,
+				837B8A7B26B1325E00936600 /* XCRemoteSwiftPackageReference "SolidAuthSwift" */,
+				837B8A8326B1349F00936600 /* XCRemoteSwiftPackageReference "PersistentValue" */,
 			);
-			productRefGroup = 837B82F426AD0DCB00936600 /* Products */;
+			productRefGroup = 837B8A6A26B1312300936600 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				837B82F226AD0DCB00936600 /* SolidAuthSwiftDemo */,
+				837B8A6826B1312300936600 /* SolidAuthSwiftDemo */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		837B82F126AD0DCB00936600 /* Resources */ = {
+		837B8A6726B1312300936600 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				837B830326AD0DCD00936600 /* LaunchScreen.storyboard in Resources */,
-				837B830026AD0DCD00936600 /* Assets.xcassets in Resources */,
-				837B82FE26AD0DCC00936600 /* Main.storyboard in Resources */,
+				837B8A7426B1312500936600 /* Preview Assets.xcassets in Resources */,
+				837B8A7126B1312500936600 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		837B82EF26AD0DCB00936600 /* Sources */ = {
+		837B8A6526B1312300936600 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				837B82FB26AD0DCC00936600 /* ViewController.swift in Sources */,
-				837B82F726AD0DCB00936600 /* AppDelegate.swift in Sources */,
-				837B82F926AD0DCC00936600 /* SceneDelegate.swift in Sources */,
+				837B8A6F26B1312300936600 /* ContentView.swift in Sources */,
+				837B8A6D26B1312300936600 /* SolidAuthSwiftDemoApp.swift in Sources */,
+				837B8A8226B1331300936600 /* Server.swift in Sources */,
+				837B8A8026B1330700936600 /* Client.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin PBXVariantGroup section */
-		837B82FC26AD0DCC00936600 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				837B82FD26AD0DCC00936600 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		837B830126AD0DCD00936600 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				837B830226AD0DCD00936600 /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		837B830526AD0DCD00936600 /* Debug */ = {
+		837B8A7626B1312500936600 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -244,7 +245,7 @@
 			};
 			name = Debug;
 		};
-		837B830626AD0DCD00936600 /* Release */ = {
+		837B8A7726B1312500936600 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -299,14 +300,17 @@
 			};
 			name = Release;
 		};
-		837B830826AD0DCD00936600 /* Debug */ = {
+		837B8A7926B1312500936600 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"SolidAuthSwiftDemo/Preview Content\"";
 				DEVELOPMENT_TEAM = BH68R29JBE;
+				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SolidAuthSwiftDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -318,14 +322,17 @@
 			};
 			name = Debug;
 		};
-		837B830926AD0DCD00936600 /* Release */ = {
+		837B8A7A26B1312500936600 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_ASSET_PATHS = "\"SolidAuthSwiftDemo/Preview Content\"";
 				DEVELOPMENT_TEAM = BH68R29JBE;
+				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = SolidAuthSwiftDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -340,20 +347,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		837B82EE26AD0DCB00936600 /* Build configuration list for PBXProject "SolidAuthSwiftDemo" */ = {
+		837B8A6426B1312300936600 /* Build configuration list for PBXProject "SolidAuthSwiftDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				837B830526AD0DCD00936600 /* Debug */,
-				837B830626AD0DCD00936600 /* Release */,
+				837B8A7626B1312500936600 /* Debug */,
+				837B8A7726B1312500936600 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		837B830726AD0DCD00936600 /* Build configuration list for PBXNativeTarget "SolidAuthSwiftDemo" */ = {
+		837B8A7826B1312500936600 /* Build configuration list for PBXNativeTarget "SolidAuthSwiftDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				837B830826AD0DCD00936600 /* Debug */,
-				837B830926AD0DCD00936600 /* Release */,
+				837B8A7926B1312500936600 /* Debug */,
+				837B8A7A26B1312500936600 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -361,23 +368,36 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		837B830C26AD106D00936600 /* XCRemoteSwiftPackageReference "SolidAuthSwift" */ = {
+		837B8A7B26B1325E00936600 /* XCRemoteSwiftPackageReference "SolidAuthSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "http://github.com/crspybits/SolidAuthSwift";
+			repositoryURL = "http://github.com/crspybits/SolidAuthSwift.git";
 			requirement = {
 				branch = main;
 				kind = branch;
 			};
 		};
+		837B8A8326B1349F00936600 /* XCRemoteSwiftPackageReference "PersistentValue" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/crspybits/PersistentValue";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.7.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		837B830D26AD106D00936600 /* SolidAuthSwiftUI */ = {
+		837B8A7C26B1325E00936600 /* SolidAuthSwiftUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 837B830C26AD106D00936600 /* XCRemoteSwiftPackageReference "SolidAuthSwift" */;
+			package = 837B8A7B26B1325E00936600 /* XCRemoteSwiftPackageReference "SolidAuthSwift" */;
 			productName = SolidAuthSwiftUI;
+		};
+		837B8A8426B1349F00936600 /* PersistentValue */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 837B8A8326B1349F00936600 /* XCRemoteSwiftPackageReference "PersistentValue" */;
+			productName = PersistentValue;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
-	rootObject = 837B82EB26AD0DCB00936600 /* Project object */;
+	rootObject = 837B8A6126B1312300936600 /* Project object */;
 }
