@@ -26,7 +26,7 @@ public class TokenResponse: Codable {
 }
 
 extension TokenResponse {
-    // Only suitable for use when the TokenRequest that generated the TokenResponse used a .code
+    // Only for use when the TokenRequest that generated the TokenResponse used a .code
     public func createRefreshParameters(tokenEndpoint: URL, clientId: String) -> RefreshParameters? {
         guard let refresh_token = refresh_token else {
             return nil
