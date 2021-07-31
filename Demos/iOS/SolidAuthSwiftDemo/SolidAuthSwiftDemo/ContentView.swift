@@ -44,17 +44,31 @@ struct ContentView: View {
                 Spacer().frame(height: spacerHeight)
                     
                 Button(action: {
-                    if let jwksURL = client.response?.parameters.jwksURL {
-                        server.validateAccessToken(jwksURL: jwksURL)
+                    if let accessToken = server.accessToken,
+                        let jwksURL = client.response?.parameters.jwksURL {
+                        server.validateToken(accessToken, jwksURL: jwksURL)
                     }
                 }, label: {
-                    Text("Validate tokens")
+                    Text("Validate access token")
                         .font(.title)
                         .disabled(!client.initialized || client.response == nil)
                 })
                 
                 Spacer().frame(height: spacerHeight)
 
+                Button(action: {
+                    if let idToken = server.idToken,
+                        let jwksURL = client.response?.parameters.jwksURL {
+                        server.validateToken(idToken, jwksURL: jwksURL)
+                    }
+                }, label: {
+                    Text("Validate id token")
+                        .font(.title)
+                        .disabled(!client.initialized || client.response == nil)
+                })
+                
+                Spacer().frame(height: spacerHeight)
+                
                 Button(action: {
                     if let refreshParams = server.refreshParams {
                         server.refreshTokens(params: refreshParams)

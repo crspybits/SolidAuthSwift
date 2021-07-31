@@ -1,5 +1,5 @@
 //
-//  AccessTokenClaims.swift
+//  TokenClaims.swift
 //  
 //
 //  Created by Christopher G Prince on 7/29/21.
@@ -29,9 +29,9 @@ import JWTKit
 }
  */
 
-// Body claims for access token
+// Body claims for access and id tokens
 
-public struct AccessTokenClaims: JWTPayload {
+public struct TokenClaims: JWTPayload {
     public struct JKT: Codable {
         var jkt: String?
     }
@@ -48,7 +48,7 @@ public struct AccessTokenClaims: JWTPayload {
     public var webid: String?
     
     public func verify(using signer: JWTSigner) throws {
-        // nop; use validateClaims in ValidateAccessToken
+        // nop; use validateClaims in Token
     }
 }
 

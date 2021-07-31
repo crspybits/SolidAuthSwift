@@ -1,5 +1,5 @@
 //
-//  ValidateAccessToken.swift
+//  Token.swift
 //  
 //
 //  Created by Christopher G Prince on 7/27/21.
@@ -9,17 +9,17 @@ import Foundation
 import SwiftJWT
 import JWTKit
 
-// Given an access token that resulted from a TokenRequest, check to see if it is valid and if it has expired.
+// Given a token that resulted from a TokenRequest, check to see if it is valid and if it has expired.
 
-public class AccessToken {
-    public let claims: AccessTokenClaims
+public class Token {
+    public let claims: TokenClaims
     
-    // This verifies the signature of the access token-- and throws an error if it isn't correct.
-    public init(jwks: JWKS, accessToken: String) throws {
+    // This verifies the signature of the tokenString -- and throws an error if it isn't correct.
+    public init(_ tokenString: String, jwks: JWKS) throws {
         let signers = JWTSigners()
         try signers.use(jwks: jwks)
         
-        self.claims = try signers.verify(accessToken, as: AccessTokenClaims.self)
+        self.claims = try signers.verify(tokenString, as: TokenClaims.self)
     }
     
     public enum ValidateClaimsResult {
