@@ -152,34 +152,46 @@ class Server: ObservableObject {
         }
     }
     
-    func validateAccessToken(jwksURL: URL) {
+    var accessToken: String? {
+        guard let tokenResponse = self.tokenResponse,
+            let accessToken = tokenResponse.access_token else {
+            return nil
+        }
+        
+        return accessToken
+    }
+    
+    var idToken: String? {
+        guard let tokenResponse = self.tokenResponse,
+            let idToken = tokenResponse.id_token else {
+            return nil
+        }
+        
+        return idToken
+    }
+
+    func validateToken(_ tokenString: String, jwksURL: URL) {
         jwksRequest = JwksRequest(jwksURL: jwksURL)
         jwksRequest.send { result in
             switch result {
             case .failure(let error):
                 logger.error("JwksRequest: \(error)")
             case .success(let response):
-                guard let tokenResponse = self.tokenResponse,
-                    let accessTokenString = tokenResponse.access_token else {
-                    logger.error("Could not get token response or access token")
-                    return
-                }
-                
                 // logger.debug("JwksRequest: \(response.jwks.keys)")
                 
-                let accessToken:AccessToken
+                let token:Token
                 
                 do {
-                    accessToken = try AccessToken(jwks: response.jwks, accessToken: accessTokenString)
+                    token = try Token(tokenString, jwks: response.jwks)
                 } catch let error {
                     logger.error("Failed validating access token: \(error)")
                     return
                 }
                 
-                assert(accessToken.claims.exp != nil)
-                assert(accessToken.claims.iat != nil)
+                assert(token.claims.exp != nil)
+                assert(token.claims.iat != nil)
                 
-                guard accessToken.validateClaims() == .success else {
+                guard token.validateClaims() == .success else {
                     logger.error("Failed validating access token claims")
                     return
                 }
@@ -189,4 +201,5 @@ class Server: ObservableObject {
         }
     }
 }
+
 ```
