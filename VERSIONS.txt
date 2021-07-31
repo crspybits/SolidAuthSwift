@@ -1,4 +1,7 @@
 SolidAuthSwift
 
+Version 0.0.2 (7/31/21)
+	Update to a specific package version.
+    
 Version 0.0.1 (7/31/21)
 	Initial version.
