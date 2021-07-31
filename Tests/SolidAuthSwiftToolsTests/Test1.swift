@@ -18,17 +18,12 @@ final class SolidAuthSwiftToolsTests: XCTestCase {
     // The DPoP.swift file has instructions for generating the JWK. After that, I used:
     //      sed -E 's/([^\]|^)"/\1\\"/g' < privateKey.jwk
     // to escape the double quotes
-    
-    let keyPairFile = URL(fileURLWithPath: "../Private/SolidAuthSwiftTools/keyPair.json")
+
     var keyPair:KeyPair!
     
     override func setUp() {
         super.setUp()
-        guard let keyPair = try? KeyPair.loadFrom(file: keyPairFile) else {
-            XCTFail()
-            return
-        }
-        self.keyPair = keyPair
+        self.keyPair = KeyPair.example
     }
     
     func testCreatePublicAndPrivateKeys() throws {

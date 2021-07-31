@@ -15,11 +15,17 @@ class Client: ObservableObject {
     @Published var initialized: Bool = false
     
     private let config = SignInConfiguration(
-        issuer: "https://solidcommunity.net",
+        issuer: "https://inrupt.net",
+        //issuer: "https://solidcommunity.net",
+        
         redirectURI: "biz.SpasticMuffin.Neebla.demo:/mypath",
         clientName: "Neebla",
         scopes: [.openid, .profile, .webid, .offlineAccess],
-        responseTypes:  [.code /* , .token */])
+        
+        // With `https://solidcommunity.net` if I use:
+        //      responseTypes:  [.code, .token]
+        // I get: unsupported_response_type
+        responseTypes:  [.code, .idToken])
     private var controller: SignInController!
     
     init() {

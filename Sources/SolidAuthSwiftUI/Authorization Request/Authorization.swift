@@ -27,8 +27,14 @@ public class Authorization: NSObject {
     var presentationContextProvider: ASWebAuthenticationPresentationContextProviding?
     var completion: ((Result<AuthorizationResponse, Error>) -> Void)!
     var queue: DispatchQueue!
-    
-    // If you use a nil `presentationContextProvider`, this class provides a default.
+
+    /**
+     * Carry out the authorization request. See https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-6
+     *
+     * Parameters:
+     *  request: The request parameters.
+     *  presentationContextProvider: If you use a nil `presentationContextProvider`, this class provides a default.
+     */
     public init(request: AuthorizationRequest, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil) {
         self.request = request
         self.presentationContextProvider = presentationContextProvider

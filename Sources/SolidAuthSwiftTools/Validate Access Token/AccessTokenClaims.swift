@@ -32,20 +32,20 @@ import JWTKit
 // Body claims for access token
 
 public struct AccessTokenClaims: JWTPayload {
-    struct JKT: Codable {
+    public struct JKT: Codable {
         var jkt: String?
     }
 
-    var iss: String?
-    var aud: String?
-    var sub: String?
-    var exp: Date?
-    var iat: Date?
-    var nbf: Date?
-    var jti: String?
-    var cnf: JKT?
-    var client_id: String?
-    var webid: String?
+    public var iss: String?
+    public var aud: String?
+    public var sub: String?
+    public var exp: Date?
+    public var iat: Date?
+    public var nbf: Date?
+    public var jti: String?
+    public var cnf: JKT?
+    public var client_id: String?
+    public var webid: String?
     
     public func verify(using signer: JWTSigner) throws {
         // nop; use validateClaims in ValidateAccessToken

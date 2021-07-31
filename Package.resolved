@@ -38,6 +38,15 @@
         }
       },
       {
+        "package": "jwt-kit",
+        "repositoryURL": "https://github.com/vapor/jwt-kit.git",
+        "state": {
+          "branch": null,
+          "revision": "df7955305940ea0fcd1626a0a6d1a1556623f95e",
+          "version": "4.2.3"
+        }
+      },
+      {
         "package": "KituraContracts",
         "repositoryURL": "https://github.com/Kitura/KituraContracts.git",
         "state": {
@@ -62,6 +71,15 @@
           "branch": null,
           "revision": "80b04f33b086fc90e28d9ae159d43705fb348e16",
           "version": "2.2.200"
+        }
+      },
+      {
+        "package": "swift-crypto",
+        "repositoryURL": "https://github.com/apple/swift-crypto.git",
+        "state": {
+          "branch": null,
+          "revision": "3bea268b223651c4ab7b7b9ad62ef9b2d4143eb6",
+          "version": "1.1.6"
         }
       },
       {

@@ -18,6 +18,7 @@ public class AuthorizationConfiguration: NSObject {
 
     /**
      * Setup to fetch the configuration from the OP.
+     * Step 3 in https://solid.github.io/authentication-panel/solid-oidc-primer
      *
      * Parameters:
      *  issuer: e.g., https://solidcommunity.net, https://inrupt.net, or

@@ -8,10 +8,6 @@
 
 import Foundation
 
-// The main purpose of this request is to get a client id. Apparently it's possible to register one statically, but haven't seen how to do that yet.
-// For ClientID's, see https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-6
-// See also https://openid.net/specs/openid-connect-registration-1_0.html
-
 extension RegistrationRequest {
     enum RegistrationRequestError: Error {
         case nilURLRequest
@@ -22,6 +18,15 @@ extension RegistrationRequest {
         case noData
     }
     
+    /**
+     * Dyamically get a client id. Apparently it's possible to register one statically, but haven't seen how to do that yet.
+     * For ClientID's, see https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-6
+     * and https://openid.net/specs/openid-connect-registration-1_0.html
+     *
+     * Parameters:
+     *  queue: The queue to use when calling the completion.
+     *  completion: Return the result.
+     */
     public func send(queue: DispatchQueue = .main, completion: @escaping (Result<RegistrationResponse, Error>) -> Void) {
     
         func callCompletion(_ result: Result<RegistrationResponse, Error>) {

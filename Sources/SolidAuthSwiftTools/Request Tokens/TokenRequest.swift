@@ -37,13 +37,18 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
         case clientId = "client_id"
     }
     
-    let parameters: TokenRequestType
+    let requestType: TokenRequestType
     let jwk: JWK
     let privateKey: String
     
-    // You should first make a .code request and then as needed with the resulting refresh token, do .refresh requests when the access token expires.
-    public init(parameters: TokenRequestType, jwk: JWK, privateKey: String) {
-        self.parameters = parameters
+    /**
+     * Parameters:
+     *   requestType: You should first make a .code request and then as needed with the resulting refresh token, do .refresh requests when the access token expires.
+     *   jwk: The public key
+     *   privateKey: The private key
+     */
+    public init(requestType: TokenRequestType, jwk: JWK, privateKey: String) {
+        self.requestType = requestType
         self.jwk = jwk
         self.privateKey = privateKey
     }
@@ -57,7 +62,7 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
         }
         
         let httpMethod = "POST"
-        let bodyClaims = BodyClaims(htu: parameters.basics.tokenEndpoint.absoluteString, htm: httpMethod, jti: UUID().uuidString)
+        let bodyClaims = BodyClaims(htu: requestType.basics.tokenEndpoint.absoluteString, htm: httpMethod, jti: UUID().uuidString)
         let dpop = DPoP(jwk: jwk, privateKey: privateKey, body: bodyClaims)
         
         let dpopHeader: String
@@ -71,7 +76,7 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
 
         let bodyData = self.body()
         
-        var request = URLRequest(url: parameters.basics.tokenEndpoint)
+        var request = URLRequest(url: requestType.basics.tokenEndpoint)
         request.httpMethod = httpMethod
         request.httpBody = bodyData
         
@@ -127,10 +132,10 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
         var values = [URLQueryItem]()
 
         values += [
-            URLQueryItem(name: Keys.grantType.rawValue, value: parameters.basics.grantType),
+            URLQueryItem(name: Keys.grantType.rawValue, value: requestType.basics.grantType),
         ]
         
-        switch parameters {
+        switch requestType {
         case .code(let code):
             values += [
                 URLQueryItem(name: Keys.codeVerifier.rawValue, value: code.codeVerifier),
@@ -145,7 +150,7 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
 
         // Common body parameters
         values += [
-            URLQueryItem(name: Keys.clientId.rawValue, value: parameters.basics.clientId),
+            URLQueryItem(name: Keys.clientId.rawValue, value: requestType.basics.clientId),
         ]
             
         let pieces = values.map(self.urlEncode)

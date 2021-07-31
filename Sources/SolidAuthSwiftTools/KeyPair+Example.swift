@@ -1,0 +1,27 @@
+//
+//  KeyPair+Example.swift
+//  
+//
+//  Created by Christopher G Prince on 7/30/21.
+//
+
+import Foundation
+
+// I could put this into its own separate Swift Package Manager library, but that seems like a lot of extra work and structure.
+// WARNING: These are an example only. DO NOT USE THEM IN YOUR APPLICATION. THEY ARE KNOWN AND THUS NOT SECURE.
+
+#if DEBUG
+
+public extension KeyPair {
+    static var example: KeyPair {
+        return KeyPair(
+            publicKey: "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAqy1KTFw5GjtGgJuiuylY\n4Pxfys9xkzTv9ZBoJBXOpQGrKXjKqcxMx+LAQ0RVw+Gbs6+EmjAT4EUnMD7ipdle\naoqpTNL7TNWtK4TJiHnYY4yk8tZ0o8lqkxbi8UNBgNcx77uSkWyFlv5fjNYtCFdg\nqgb9IvTq9wILvQy56lf8Ma/SMN1mar+NNXaDfmioR6np/zJlApk0bRQwHAtzhFX9\nVQp5a1gmWMpOpTeXTqurO7P8B3r1sjBbmyGIAt7Tw7EFgD9y6CWNaprktRh5URaU\nZuK+RF6o2lCg4k79bBQHvmrQtMvI8yBZDNohQ1RyYSPsKcM8/Xj+ISZsluS5sPZG\nfrXWjKk12Fb2X64VUn9iVL+sdaDrnjiZQxYmSe4I8bkHuboQnKTqkCzDfRcnTk+z\nyGBqjEh7D30+pKNxm42A8xMwkQ9gOHnfd9CvV7qgueGpV/lRPXe53W0nGzgZgBKF\n5tuJk9QgdwXqptkewMV3pvzx0lSNzA8v42pdPFMwrspHR5L5dEazrsMJuZ8jAAiy\nCNRsApQmdW5tu0JwKX7Zkk66X7qjOMo+WY08CD3+5NB9tLQWAibyh4uK2xhRoe0R\nwh1wQhEB0Wb+XE239WpXnXA11LS0HbA1Xs+XfB3Q8v+YeB43EcA8L7GmMrz9BXhr\nRK6QzdHVhtsL3qcSzPRZ6R0CAwEAAQ==\n-----END PUBLIC KEY-----\n",
+            
+            privateKey: "-----BEGIN RSA PRIVATE KEY-----\n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\n-----END RSA PRIVATE KEY-----\n",
+            
+            // This is the public PEM key converted to a JWK. See DPoP.swift comments.
+            jwk: "{\"use\": \"sig\", \"e\": \"AQAB\", \"kty\": \"RSA\", \"alg\": \"RS256\", \"n\": \"qy1KTFw5GjtGgJuiuylY4Pxfys9xkzTv9ZBoJBXOpQGrKXjKqcxMx-LAQ0RVw-Gbs6-EmjAT4EUnMD7ipdleaoqpTNL7TNWtK4TJiHnYY4yk8tZ0o8lqkxbi8UNBgNcx77uSkWyFlv5fjNYtCFdgqgb9IvTq9wILvQy56lf8Ma_SMN1mar-NNXaDfmioR6np_zJlApk0bRQwHAtzhFX9VQp5a1gmWMpOpTeXTqurO7P8B3r1sjBbmyGIAt7Tw7EFgD9y6CWNaprktRh5URaUZuK-RF6o2lCg4k79bBQHvmrQtMvI8yBZDNohQ1RyYSPsKcM8_Xj-ISZsluS5sPZGfrXWjKk12Fb2X64VUn9iVL-sdaDrnjiZQxYmSe4I8bkHuboQnKTqkCzDfRcnTk-zyGBqjEh7D30-pKNxm42A8xMwkQ9gOHnfd9CvV7qgueGpV_lRPXe53W0nGzgZgBKF5tuJk9QgdwXqptkewMV3pvzx0lSNzA8v42pdPFMwrspHR5L5dEazrsMJuZ8jAAiyCNRsApQmdW5tu0JwKX7Zkk66X7qjOMo-WY08CD3-5NB9tLQWAibyh4uK2xhRoe0Rwh1wQhEB0Wb-XE239WpXnXA11LS0HbA1Xs-XfB3Q8v-YeB43EcA8L7GmMrz9BXhrRK6QzdHVhtsL3qcSzPRZ6R0\", \"kid\": \"example\"}")
+    }
+}
+
+#endif

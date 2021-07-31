@@ -7,9 +7,9 @@
 
 import Foundation
 import JWTKit
-
-// See jwks_uri in https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
-// and https://datatracker.ietf.org/doc/html/draft-ietf-jose-json-web-key
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
 
 public class JwksRequest {
     enum JwksRequestError: Error {
@@ -20,10 +20,18 @@ public class JwksRequest {
     
     let jwksURL: URL
     
+    /**
+     * Parameters:
+     *  jwksURL: See jwks_uri in https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
+     *  and https://datatracker.ietf.org/doc/html/draft-ietf-jose-json-web-key
+     */
     public init(jwksURL: URL) {
         self.jwksURL = jwksURL
     }
     
+    /**
+     * Retrieve the JWK public keys from the Pod server. Doesn't need authentication.
+     */
     public func send(queue: DispatchQueue = .main, completion: @escaping (Result<JwksResponse, Error>) -> Void) {
     
         func callCompletion(_ result: Result<JwksResponse, Error>) {

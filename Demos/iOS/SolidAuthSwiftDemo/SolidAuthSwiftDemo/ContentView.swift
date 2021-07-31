@@ -45,7 +45,7 @@ struct ContentView: View {
                     
                 Button(action: {
                     if let jwksURL = client.response?.parameters.jwksURL {
-                        server.jwksRequest(jwksURL: jwksURL)
+                        server.validateAccessToken(jwksURL: jwksURL)
                     }
                 }, label: {
                     Text("Validate tokens")

@@ -46,11 +46,12 @@ public class SignInController {
         authConfig = AuthorizationConfiguration(issuer: config.issuer)
     }
 
-    /* Starts off sequence:
-        1) fetch configuration
-        2) Client registration
-        3) Authorization request
-    */
+    /**
+     *  Starts off sequence:
+     *      1) Fetch configuration
+     *      2) Client registration
+     *      3) Authorization request
+     */
     public func start(queue: DispatchQueue = .main, completion: @escaping (Result<SignInController.Response, Error>)-> Void) {
         self.completion = completion
         self.queue = queue

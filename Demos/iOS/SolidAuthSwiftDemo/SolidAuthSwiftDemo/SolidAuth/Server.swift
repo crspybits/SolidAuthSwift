@@ -10,25 +10,15 @@ import SolidAuthSwiftUI
 import SolidAuthSwiftTools
 import Logging
 
-let keyPairPath = "/Users/chris/Developer/Private/SolidAuthSwiftTools/keyPair.json"
-
 class Server: ObservableObject {
     var jwk: JWK_RSA!
-    var keyPair: KeyPair!
+    let keyPair: KeyPair = KeyPair.example
     var tokenRequest:TokenRequest<JWK_RSA>!
     @Published var refreshParams: RefreshParameters?
     var jwksRequest: JwksRequest!
     var tokenResponse: TokenResponse!
     
     init() {
-        let keyPairFile = URL(fileURLWithPath: keyPairPath)
-        
-        guard let keyPair = try? KeyPair.loadFrom(file: keyPairFile) else {
-            logger.error("Could not load KeyPair")
-            return
-        }
-        self.keyPair = keyPair
-        
         do {
             jwk = try JSONDecoder().decode(JWK_RSA.self, from: Data(keyPair.jwk.utf8))
         } catch let error {
@@ -39,7 +29,7 @@ class Server: ObservableObject {
     
     // I'm planning to do this request on the server: Because I don't want to have the encryption private key on the iOS client. But it's easier for now to do a test on iOS.
     func requestTokens(params:CodeParameters) {
-        tokenRequest = TokenRequest(parameters: .code(params), jwk: jwk, privateKey: keyPair.privateKey)
+        tokenRequest = TokenRequest(requestType: .code(params), jwk: jwk, privateKey: keyPair.privateKey)
         tokenRequest.send { result in
             switch result {
             case .failure(let error):
@@ -62,7 +52,7 @@ class Server: ObservableObject {
     
     // Again, this is just a test, and I intend it to be carried out on the server-- to refresh an expired access token.
     func refreshTokens(params: RefreshParameters) {
-        tokenRequest = TokenRequest(parameters: .refresh(params), jwk: jwk, privateKey: keyPair.privateKey)
+        tokenRequest = TokenRequest(requestType: .refresh(params), jwk: jwk, privateKey: keyPair.privateKey)
         tokenRequest.send { result in
             switch result {
             case .failure(let error):
@@ -75,7 +65,7 @@ class Server: ObservableObject {
         }
     }
     
-    func jwksRequest(jwksURL: URL) {
+    func validateAccessToken(jwksURL: URL) {
         jwksRequest = JwksRequest(jwksURL: jwksURL)
         jwksRequest.send { result in
             switch result {
@@ -98,6 +88,9 @@ class Server: ObservableObject {
                     logger.error("Failed validating access token: \(error)")
                     return
                 }
+                
+                assert(accessToken.claims.exp != nil)
+                assert(accessToken.claims.iat != nil)
                 
                 guard accessToken.validateClaims() == .success else {
                     logger.error("Failed validating access token claims")
