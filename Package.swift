@@ -27,7 +27,7 @@ let package = Package(
         .package(url: "https://github.com/Flight-School/AnyCodable.git", from: "0.6.0"),
         
         // Using my own forked copy of SwiftJWT-- because of a single method I needed to make public. Changed its name because of a conflict.
-        .package(name: "SwiftJWT2", url: "https://github.com/crspybits/Swift-JWT.git", from: "3.6.201"),
+        .package(name: "SwiftJWT2", url: "https://github.com/crspybits/Swift-JWT2.git", from: "3.6.201"),
         
         .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0")
         
