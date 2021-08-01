@@ -34,3 +34,16 @@ public struct CodeParameters: ParametersBasics, Codable {
         self.jwksURL = jwksURL
     }
 }
+
+/// A convenience, to send to the server
+public struct ServerPacket: Codable {
+    public let parameters: CodeParameters
+    public var email: String?
+    public var username: String?
+    
+    public init(parameters: CodeParameters, email: String?, username: String?) {
+        self.parameters = parameters
+        self.email = email
+        self.username = username
+    }
+}
