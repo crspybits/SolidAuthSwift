@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftJWT
+import SwiftJWT2
 import JWTKit
 
 // Given a token that resulted from a TokenRequest, check to see if it is valid and if it has expired.

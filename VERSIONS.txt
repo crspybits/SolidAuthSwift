@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.4 (7/31/21)
+    Changed name of Swift-JWT to Swift-JWT2 due to conflict
+    
 Version 0.0.3 (7/31/21)
     Added ServerPacket
     

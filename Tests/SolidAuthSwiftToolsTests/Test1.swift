@@ -1,6 +1,6 @@
 import XCTest
 @testable import SolidAuthSwiftTools
-import SwiftJWT
+import SwiftJWT2
 import CryptorRSA
 
 // Run tests:

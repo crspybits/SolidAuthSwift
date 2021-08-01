@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftJWT
+import SwiftJWT2
 
 // From: https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-13s
 /*

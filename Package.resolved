@@ -65,6 +65,15 @@
         }
       },
       {
+        "package": "OpenSSL",
+        "repositoryURL": "https://github.com/Kitura/OpenSSL.git",
+        "state": {
+          "branch": null,
+          "revision": "80b04f33b086fc90e28d9ae159d43705fb348e16",
+          "version": "2.2.200"
+        }
+      },
+      {
         "package": "swift-crypto",
         "repositoryURL": "https://github.com/apple/swift-crypto.git",
         "state": {
@@ -74,12 +83,12 @@
         }
       },
       {
-        "package": "SwiftJWT",
+        "package": "SwiftJWT2",
         "repositoryURL": "https://github.com/crspybits/Swift-JWT.git",
         "state": {
           "branch": null,
-          "revision": "63551370327fb66589d468df84689e334749268c",
-          "version": "3.6.201"
+          "revision": "2f928445272b8c7a567ab485c2a5a3c3d129eec5",
+          "version": "3.6.202"
         }
       },
       {
