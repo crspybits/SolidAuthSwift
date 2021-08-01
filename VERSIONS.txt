@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.6 (7/31/21)
+    Add CodingKeys
+
 Version 0.0.5 (7/31/21)
     Changed repo name of Swift-JWT.
     

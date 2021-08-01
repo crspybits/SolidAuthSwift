@@ -21,6 +21,17 @@ public struct CodeParameters: ParametersBasics, Codable {
     public let code: String
     public let redirectUri: String
     public let clientId: String
+    
+    // CodingKeys because I want to use this enum elsewhere.
+    public enum CodingKeys: String, CodingKey {
+        case tokenEndpoint
+        case jwksURL
+        case codeVerifier
+        case code
+        case redirectUri
+        case clientId
+    }
+    
     public var grantType: String {
         "authorization_code"
     }
