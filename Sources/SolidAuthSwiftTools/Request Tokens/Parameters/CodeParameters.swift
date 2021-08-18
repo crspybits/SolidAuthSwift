@@ -46,15 +46,16 @@ public struct CodeParameters: ParametersBasics, Codable {
     }
 }
 
-/// A convenience, to send to the server
-public struct ServerPacket: Codable {
-    public let parameters: CodeParameters
-    public var email: String?
-    public var username: String?
-    
-    public init(parameters: CodeParameters, email: String?, username: String?) {
-        self.parameters = parameters
-        self.email = email
-        self.username = username
+public extension CodeParameters {
+    static func from(fromBase64 base64: String) throws -> CodeParameters {
+        enum FromError: Error {
+            case cannotDecodeBase64
+        }
+        
+        guard let codeParametersData = Data(base64Encoded: base64) else {
+            throw FromError.cannotDecodeBase64
+        }
+
+        return try JSONDecoder().decode(CodeParameters.self, from: codeParametersData)
     }
 }

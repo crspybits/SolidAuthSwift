@@ -1,5 +1,9 @@
 SolidAuthSwift
-
+    
+Version 0.0.7 (8/17/21)
+    Removed ServerPacket-- not sending email/username to server via CredentialsSolid.
+    Added CodeParameters from base64 method.
+    
 Version 0.0.6 (7/31/21)
     Add CodingKeys
 

@@ -52,7 +52,7 @@ final class SolidAuthSwiftToolsTests: XCTestCase {
         do {
             jwk = try JSONDecoder().decode(JWK_RSA.self, from: Data(jwkString.utf8))
         } catch let error {
-            XCTFail()
+            XCTFail("\(error)")
             return
         }
                 
