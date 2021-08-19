@@ -92,12 +92,12 @@
         }
       },
       {
-        "package": "SwiftJWT",
-        "repositoryURL": "https://github.com/crspybits/Swift-JWT.git",
+        "package": "SwiftJWT2",
+        "repositoryURL": "https://github.com/crspybits/Swift-JWT2.git",
         "state": {
-          "branch": "master",
-          "revision": "4f048b1ca89af21bc0f065b0d7df4cd005d22ce0",
-          "version": null
+          "branch": null,
+          "revision": "2f928445272b8c7a567ab485c2a5a3c3d129eec5",
+          "version": "3.6.202"
         }
       },
       {
