@@ -58,4 +58,9 @@ public extension CodeParameters {
 
         return try JSONDecoder().decode(CodeParameters.self, from: codeParametersData)
     }
+    
+    func toBase64() throws -> String {
+        let serverData = try JSONEncoder().encode(self)
+        return serverData.base64EncodedString()
+    }
 }

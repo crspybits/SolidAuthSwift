@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.9 (8/18/21)
+    Added toBase64() method.
+    
 Version 0.0.8 (8/18/21)
     Update packages.
     

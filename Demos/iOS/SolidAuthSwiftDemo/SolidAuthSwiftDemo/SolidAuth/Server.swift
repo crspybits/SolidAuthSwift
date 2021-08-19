@@ -29,6 +29,9 @@ class Server: ObservableObject {
     
     // I'm planning to do this request on the server: Because I don't want to have the encryption private key on the iOS client. But it's easier for now to do a test on iOS.
     func requestTokens(params:CodeParameters) {
+        let base64 = try? params.toBase64()
+        logger.debug("CodeParameters: (base64): \(String(describing: base64))")
+        
         tokenRequest = TokenRequest(requestType: .code(params), jwk: jwk, privateKey: keyPair.privateKey)
         tokenRequest.send { result in
             switch result {
@@ -104,12 +107,14 @@ class Server: ObservableObject {
                 assert(token.claims.exp != nil)
                 assert(token.claims.iat != nil)
                 
+                logger.debug("token.claims.sub: \(String(describing: token.claims.sub))")
+
                 guard token.validateClaims() == .success else {
                     logger.error("Failed validating access token claims")
                     return
                 }
                 
-                logger.debug("SUCCESS: validated access token!")
+                logger.debug("SUCCESS: validated token!")
             }
         }
     }
