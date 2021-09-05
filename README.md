@@ -7,7 +7,11 @@ Some discussion on the [Solid Project forum](https://forum.solidproject.org/t/bo
 See also https://datatracker.ietf.org/doc/html/draft-ietf-oauth-dpop-03
 
 ## Tested
-With issuers: https://inrupt.net and https://solidcommunity.net
+With issuers:
+
+1) https://inrupt.net
+
+2)  https://solidcommunity.net
 
 ## SolidAuthSwiftUI
 
@@ -85,9 +89,9 @@ Despite having added "client_name" to the registration request, I'm still seeing
 
 This is intended to be used from a custom server. It is separated out from the `SolidAuthSwiftUI` library because `SolidAuthSwiftUI` contains UIKit code, and will *not* work on Linux.
 
-I'm designing for the specific use case where the key pair (needed to generate DPoP tokens) is stored on a custom server only. The key pair will *not* be present on the iOS client app.
+Also there is a security issue: I'm designing for the specific use case where the key pair (needed to generate DPoP tokens) is stored on a custom server only. The key pair will *not* be present on the iOS client app.
 
- The server I'm considering is running on Linux. Note that this is not a Solid Pod,. It's a custom server that will be making requests of a Solid Pod.
+ The server I'm considering is running on Linux. Note that this is not a Solid Pod. It's a custom server that will be making requests of a Solid Pod.
 
 ### Usage example (see SolidAuthDemoApp)
 
