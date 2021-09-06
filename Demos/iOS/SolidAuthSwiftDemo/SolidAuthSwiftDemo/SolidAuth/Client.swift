@@ -15,8 +15,17 @@ class Client: ObservableObject {
     @Published var initialized: Bool = false
     
     private let config = SignInConfiguration(
-        issuer: "https://inrupt.net",
-        //issuer: "https://solidcommunity.net",
+        // These work:
+        // issuer: "https://inrupt.net",
+        // issuer: "https://solidcommunity.net",
+        
+        // issuer: "https://pod.inrupt.com", // This fails with a 401
+        
+        // This is failing too: https://github.com/crspybits/SolidAuthSwift/issues/3
+        // issuer: "https://broker.pod.inrupt.com",
+        
+        // This is failing: https://github.com/crspybits/SolidAuthSwift/issues/4
+        issuer: "https://crspybits.trinpod.us",
         
         redirectURI: "biz.SpasticMuffin.Neebla.demo:/mypath",
         clientName: "Neebla",

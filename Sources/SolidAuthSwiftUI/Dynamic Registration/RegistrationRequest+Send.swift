@@ -40,6 +40,8 @@ extension RegistrationRequest {
             return
         }
         
+        logger.debug("URL Request: \(request)")
+        
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         session.dataTask(with: request, completionHandler: { data, response, error in
             if let error = error {

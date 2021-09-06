@@ -111,19 +111,23 @@ public class RegistrationRequest: NSObject {
             return nil
         }
         
+        logger.debug("postBody: \(postBody)")
+        
         let registrationRequestURL: URL? = configuration.registrationEndpoint
-        var URLRequestA: URLRequest? = nil
+        var request: URLRequest? = nil
         if let anURL = registrationRequestURL {
-            URLRequestA = URLRequest(url: anURL)
+            request = URLRequest(url: anURL)
         }
-        URLRequestA?.httpMethod = kHTTPPost
-        URLRequestA?.setValue(kHTTPContentTypeHeaderValue, forHTTPHeaderField: kHTTPContentTypeHeaderKey)
+        request?.httpMethod = kHTTPPost
+        request?.setValue(kHTTPContentTypeHeaderValue, forHTTPHeaderField: kHTTPContentTypeHeaderKey)
         if let initialAccessToken = initialAccessToken {
             let value = "\(kBearer) \(initialAccessToken)"
-            URLRequestA?.setValue(value, forHTTPHeaderField: kHTTPAuthorizationHeaderKey)
+            request?.setValue(value, forHTTPHeaderField: kHTTPAuthorizationHeaderKey)
         }
-        URLRequestA?.httpBody = postBody
-        return URLRequestA
+        request?.httpBody = postBody
+        
+        logger.debug("Headers: \(String(describing: request?.allHTTPHeaderFields))")
+        return request
     }
 
     func JSONString() -> Data? {
@@ -155,6 +159,8 @@ public class RegistrationRequest: NSObject {
         if tokenEndpointAuthenticationMethod != nil {
             dict[kTokenEndpointAuthenticationMethodParam] = tokenEndpointAuthenticationMethod
         }
+        
+        logger.debug("JSONString: dict: \(dict)")
         
         let json: Data? = try? JSONSerialization.data(withJSONObject: dict, options: [])
         return json
