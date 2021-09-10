@@ -30,10 +30,24 @@ import Logging
 class Client: ObservableObject {
     @Published var response: SignInController.Response?
     @Published var initialized: Bool = false
+    var logoutRequest: LogoutRequest!
+    static let redirect = "biz.SpasticMuffin.Neebla.demo:/mypath"
     
     private let config = SignInConfiguration(
+        // These work:
+        // issuer: "https://inrupt.net",
         issuer: "https://solidcommunity.net",
-        redirectURI: "biz.SpasticMuffin.Neebla.demo:/mypath",
+        
+        // issuer: "https://pod.inrupt.com", // This fails with a 401
+        
+        // This is failing too: https://github.com/crspybits/SolidAuthSwift/issues/3
+        // issuer: "https://broker.pod.inrupt.com",
+        
+        // This is failing: https://github.com/crspybits/SolidAuthSwift/issues/4
+        //issuer: "https://trinpod.us",
+        
+        redirectURI: redirect,
+        postLogoutRedirectURI: redirect,
         clientName: "Neebla",
         scopes: [.openid, .profile, .webid, .offlineAccess],
         
@@ -41,9 +55,10 @@ class Client: ObservableObject {
         //      responseTypes:  [.code, .token]
         // I get: unsupported_response_type
         responseTypes:  [.code, .idToken])
+
     private var controller: SignInController!
     
-    init() {
+    init() {        
         guard let controller = try? SignInController(config: config) else {
             logger.error("Could not initialize Controller")
             return
@@ -68,6 +83,27 @@ class Client: ObservableObject {
                 self.response = response
                 logger.debug("Controller response: \(response)")
             }
+        }
+    }
+    
+    func logout() {
+        guard let idToken = response?.authResponse.idToken else {
+            logger.error("Can't logout: No idToken")
+            return
+        }
+        
+        guard let endSessionEndpoint = controller.providerConfig.endSessionEndpoint else {
+            logger.error("Can't logout: No endSessionEndpoint")
+            return
+        }
+        
+        logoutRequest = LogoutRequest(idToken: idToken, endSessionEndpoint: endSessionEndpoint, config: config)
+        logoutRequest.send { error in
+            if let error = error {
+                logger.error("Failed logout: \(error)")
+                return
+            }
+            logger.debug("Logout: SUCCESS!!")
         }
     }
 }
@@ -120,6 +156,9 @@ class Server: ObservableObject {
     
     // I'm planning to do this request on the server: Because I don't want to have the encryption private key on the iOS client. But it's easier for now to do a test on iOS.
     func requestTokens(params:CodeParameters) {
+        let base64 = try? params.toBase64()
+        logger.debug("CodeParameters: (base64): \(String(describing: base64))")
+        
         tokenRequest = TokenRequest(requestType: .code(params), jwk: jwk, privateKey: keyPair.privateKey)
         tokenRequest.send { result in
             switch result {
@@ -195,15 +234,16 @@ class Server: ObservableObject {
                 assert(token.claims.exp != nil)
                 assert(token.claims.iat != nil)
                 
+                logger.debug("token.claims.sub: \(String(describing: token.claims.sub))")
+
                 guard token.validateClaims() == .success else {
                     logger.error("Failed validating access token claims")
                     return
                 }
                 
-                logger.debug("SUCCESS: validated access token!")
+                logger.debug("SUCCESS: validated token!")
             }
         }
     }
 }
-
 ```
