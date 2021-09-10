@@ -29,8 +29,8 @@ let package = Package(
         // Using my own forked copy of SwiftJWT-- because of a single method I needed to make public. Changed its name because of a conflict.
         .package(name: "SwiftJWT2", url: "https://github.com/crspybits/Swift-JWT2.git", from: "3.6.201"),
         
-        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0")
-        
+        .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0"),
+        .package(name: "SerdParser", url: "https://github.com/kasei/serd-parser", .branch("master"))
     ],
     targets: [
         .target(
@@ -46,6 +46,7 @@ let package = Package(
             dependencies: [
                 "SwiftJWT2",
                 "AnyCodable",
+                "SerdParser",
                 .product(name: "JWTKit", package: "jwt-kit"),
             ],
             path: "Sources/SolidAuthSwiftTools"),

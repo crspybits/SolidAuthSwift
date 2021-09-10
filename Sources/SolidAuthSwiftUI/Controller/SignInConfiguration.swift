@@ -14,7 +14,28 @@ public struct SignInConfiguration {
     
     // E.g., "biz.SpasticMuffin.Neebla.demo:/mypath"
     public let redirectURI: String
+    
+    var redirectURL: URL? {
+        return URL(string: redirectURI)
+    }
+    
+    var redirectScheme:String? {
+        return redirectURL?.scheme
+    }
+    
+    public let postLogoutRedirectURI: String?
 
+    var postLogoutRedirectURL: URL? {
+        guard let postLogoutRedirectURI = postLogoutRedirectURI else {
+            return nil
+        }
+        return URL(string: postLogoutRedirectURI)
+    }
+    
+    var postLogoutRedirectScheme:String? {
+        return postLogoutRedirectURL?.scheme
+    }
+    
     // It looks like this should up in the sign in UI for the Pod. But not seeing it yet when using solidcommunity.net.
     public let clientName: String
     
@@ -27,9 +48,12 @@ public struct SignInConfiguration {
     // Can be used to provide context when presenting the sign in screen.
     let presentationContextProvider: ASWebAuthenticationPresentationContextProviding?
     
-    public init(issuer: String, redirectURI: String, clientName: String, scopes: Set<Scope>, responseTypes: Set<ResponseType>, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil) {
+    // TODO: Enable presentationContextProvider for signout as well.
+    
+    public init(issuer: String, redirectURI: String, postLogoutRedirectURI: String? = nil, clientName: String, scopes: Set<Scope>, responseTypes: Set<ResponseType>, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil) {
         self.issuer = issuer
         self.redirectURI = redirectURI
+        self.postLogoutRedirectURI = postLogoutRedirectURI
         self.clientName = clientName
         self.scopes = scopes
         self.responseTypes = responseTypes

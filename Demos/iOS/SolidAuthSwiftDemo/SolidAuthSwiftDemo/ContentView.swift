@@ -7,6 +7,25 @@
 
 import SwiftUI
 
+struct DemoButton: View {
+    let spacerHeight: CGFloat?
+    let text: String
+    let action:()->()
+    
+    var body: some View {
+        if let spacerHeight = spacerHeight {
+            Spacer().frame(height: spacerHeight)
+        }
+        
+        Button(action: {
+            action()
+        }, label: {
+            Text(text)
+                .font(.title)
+        })
+    }
+}
+
 struct ContentView: View {
     @StateObject var client = Client()
     @StateObject var server = Server()
@@ -21,63 +40,46 @@ struct ContentView: View {
             Spacer()
             
             VStack {
-                Button(action: {
+                DemoButton(spacerHeight: nil, text: "Sign In") {
                     client.start()
-                }, label: {
-                    Text("Sign In")
-                        .font(.title)
-                        .disabled(!client.initialized)
-                })
-                
-                Spacer().frame(height: spacerHeight)
-                
-                Button(action: {
+                }
+                .disabled(!client.initialized)
+
+                DemoButton(spacerHeight: spacerHeight, text: "Request tokens") {
                     if let params = client.response?.parameters {
                         server.requestTokens(params: params)
                     }
-                }, label: {
-                    Text("Request tokens")
-                        .font(.title)
-                        .disabled(!client.initialized || client.response == nil)
-                })
+                }
+                .disabled(!client.initialized || client.response == nil)
 
-                Spacer().frame(height: spacerHeight)
-                    
-                Button(action: {
+                DemoButton(spacerHeight: spacerHeight, text: "Validate access token") {
                     if let accessToken = server.accessToken,
                         let jwksURL = client.response?.parameters.jwksURL {
                         server.validateToken(accessToken, jwksURL: jwksURL)
                     }
-                }, label: {
-                    Text("Validate access token")
-                        .font(.title)
-                        .disabled(!client.initialized || client.response == nil)
-                })
-                
-                Spacer().frame(height: spacerHeight)
-
-                Button(action: {
+                }
+                .disabled(!client.initialized || client.response == nil)
+                        
+                DemoButton(spacerHeight: spacerHeight, text: "Validate id token") {
                     if let idToken = server.idToken,
                         let jwksURL = client.response?.parameters.jwksURL {
                         server.validateToken(idToken, jwksURL: jwksURL)
                     }
-                }, label: {
-                    Text("Validate id token")
-                        .font(.title)
-                        .disabled(!client.initialized || client.response == nil)
-                })
-                
-                Spacer().frame(height: spacerHeight)
-                
-                Button(action: {
+                }
+                .disabled(!client.initialized || client.response == nil)
+        
+                DemoButton(spacerHeight: spacerHeight, text: "Refresh tokens") {
                     if let refreshParams = server.refreshParams {
                         server.refreshTokens(params: refreshParams)
                     }
-                }, label: {
-                    Text("Refresh tokens")
-                        .font(.title)
-                        .disabled(!client.initialized || client.response == nil || server.refreshParams == nil)
-                })
+                }
+                .disabled(!client.initialized || client.response == nil || server.refreshParams == nil)
+        
+                DemoButton(spacerHeight: spacerHeight, text: "Logout") {
+                    client.logout()
+                }
+                .disabled(!client.initialized || client.response == nil ||
+                    client.response?.authResponse.idToken == nil)
             }
             
             Spacer()

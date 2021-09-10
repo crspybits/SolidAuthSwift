@@ -14,6 +14,10 @@ fileprivate let kTokenEndpointKey = "token_endpoint"
 fileprivate let kUserinfoEndpointKey = "userinfo_endpoint"
 fileprivate let kJWKSURLKey = "jwks_uri"
 fileprivate let kRegistrationEndpointKey = "registration_endpoint"
+
+// https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout
+fileprivate let kEndSessionEndpointKey = "end_session_endpoint"
+
 fileprivate let kScopesSupportedKey = "scopes_supported"
 fileprivate let kResponseTypesSupportedKey = "response_types_supported"
 fileprivate let kResponseModesSupportedKey = "response_modes_supported"
@@ -59,6 +63,7 @@ public class ProviderConfiguration: NSObject, Codable {
     public var tokenEndpoint: URL?
     public var issuer: URL?
     public var registrationEndpoint: URL?
+    public var endSessionEndpoint: URL?
     public var discoveryDocument: ProviderConfiguration?
 
     private func getFromDiscoveryDictionary<T>(key: String) -> T? {
@@ -226,6 +231,7 @@ public class ProviderConfiguration: NSObject, Codable {
         tokenEndpoint = getURLFromDiscoveryDictionary(key: kTokenEndpointKey)
         issuer = getURLFromDiscoveryDictionary(key: kIssuerKey)
         registrationEndpoint = getURLFromDiscoveryDictionary(key: kRegistrationEndpointKey)
+        endSessionEndpoint = getURLFromDiscoveryDictionary(key: kEndSessionEndpointKey)
     }
     
     public override init() {

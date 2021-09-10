@@ -24,22 +24,32 @@ public class Authorization: NSObject {
     }
     
     public let request: AuthorizationRequest
+    let ephemeralSesssion: Bool
     var presentationContextProvider: ASWebAuthenticationPresentationContextProviding?
     var completion: ((Result<AuthorizationResponse, Error>) -> Void)!
     var queue: DispatchQueue!
 
     /**
-     * Carry out the authorization request. See https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-6
+     * Initialize the authorization request. See https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-6
      *
      * Parameters:
      *  request: The request parameters.
-     *  presentationContextProvider: If you use a nil `presentationContextProvider`, this class provides a default.
+     *  presentationContextProvider: If you use a nil
+     *    `presentationContextProvider`, this class provides a default.
+     *  ephemeralSesssion: Use this value for prefersEphemeralWebBrowserSession
+     *    for the ASWebAuthenticationSession. If you use `false`, then each
+     *    subsequent time (at least for short subsequent time intervals) you use
+     *    `makeRequest` to have the sign in (without
+     *    subsequently signing out), no actual sign in screen will be shown,
+     *    unless the user signs out. See also comment [1] in code below.
      */
-    public init(request: AuthorizationRequest, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil) {
+    public init(request: AuthorizationRequest, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil, ephemeralSesssion: Bool = true) {
         self.request = request
         self.presentationContextProvider = presentationContextProvider
+        self.ephemeralSesssion = ephemeralSesssion
     }
     
+    // Actually carry out the authorization request.
     public func makeRequest(queue: DispatchQueue = .main, completion: @escaping (Result<AuthorizationResponse, Error>) -> Void) {
         self.completion = completion
         self.queue = queue
@@ -97,6 +107,9 @@ public class Authorization: NSObject {
             }
         })
 
+        // [1] Trying to deal with signout issue. Without setting this to `true`, after a sign in, if you try to sign in again, the username/password web UI is *not* shown. I believe this is because a cookie gets stored somewhere in iOS, and the following causes that cookie to not get set. So, second and following times you do get asked to sign in. See also https://stackoverflow.com/questions/47207914/sfauthenticationsession-aswebauthenticationsession-and-logging-out
+        authenticationVC.prefersEphemeralWebBrowserSession = ephemeralSesssion
+        
         authenticationVC.presentationContextProvider = presentationContextProvider ?? self
         
         if !authenticationVC.start() {

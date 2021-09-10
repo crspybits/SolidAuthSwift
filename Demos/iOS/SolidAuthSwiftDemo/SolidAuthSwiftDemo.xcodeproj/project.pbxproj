@@ -18,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		83756D6826E6EDB900EAFCEC /* SolidAuthSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SolidAuthSwift; path = ../../..; sourceTree = "<group>"; };
 		837B8A6926B1312300936600 /* SolidAuthSwiftDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SolidAuthSwiftDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		837B8A6C26B1312300936600 /* SolidAuthSwiftDemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SolidAuthSwiftDemoApp.swift; sourceTree = "<group>"; };
 		837B8A6E26B1312300936600 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -26,7 +27,6 @@
 		837B8A7526B1312500936600 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		837B8A7F26B1330700936600 /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
 		837B8A8126B1331300936600 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
-		837B8A8826B1377F00936600 /* SolidAuthSwift */ = {isa = PBXFileReference; lastKnownFileType = folder; name = SolidAuthSwift; path = ../../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,7 +92,7 @@
 		837B8A8726B1375F00936600 /* Local Packages */ = {
 			isa = PBXGroup;
 			children = (
-				837B8A8826B1377F00936600 /* SolidAuthSwift */,
+				83756D6826E6EDB900EAFCEC /* SolidAuthSwift */,
 			);
 			name = "Local Packages";
 			sourceTree = "<group>";

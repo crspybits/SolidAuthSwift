@@ -22,6 +22,12 @@ public class Token {
         self.claims = try signers.verify(tokenString, as: TokenClaims.self)
     }
     
+    // This *does not* verify the signature of the tokenString.
+    public init(_ tokenString: String) throws {
+        let signers = JWTSigners()
+        self.claims = try signers.unverified(tokenString, as: TokenClaims.self)
+    }
+    
     public enum ValidateClaimsResult {
         case expired
         case notBefore

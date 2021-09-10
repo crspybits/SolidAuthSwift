@@ -20,6 +20,7 @@ fileprivate let kApplicationTypeNative = "native"
 fileprivate let kTokenEndpointAuthenticationMethodParam = "token_endpoint_auth_method"
 fileprivate let kApplicationTypeParam = "application_type"
 fileprivate let kRedirectURIsParam = "redirect_uris"
+fileprivate let kPostLogoutRedirectURIsParam = "post_logout_redirect_uris"
 fileprivate let kResponseTypesParam = "response_types"
 fileprivate let kGrantTypesParam = "grant_types"
 fileprivate let kSubjectTypeParam = "subject_type"
@@ -57,6 +58,12 @@ public class RegistrationRequest: NSObject {
      @see https://tools.ietf.org/html/rfc6749#section-3.1.2
      */
     let redirectURIs: [URL]
+
+    /*! @brief Redirect URI's that can be used as a `post_logout_redirect_uri` in a logout request.
+     @see https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout
+     */
+    let postLogoutRedirectURIs: [URL]?
+
     /*! @brief The response types to register for usage by this client.
      @remarks response_types
      @see http://openid.net/specs/openid-connect-core-1_0.html#Authentication
@@ -81,15 +88,16 @@ public class RegistrationRequest: NSObject {
      */
     let additionalParameters: [String : String]?
     
-    public convenience init(configuration: ProviderConfiguration, redirectURIs: [URL], clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: String?, additionalParameters: [String : String]?) {
-        self.init(configuration: configuration, redirectURIs: redirectURIs, clientName: clientName, responseTypes: responseTypes, grantTypes: grantTypes, subjectType: subjectType, tokenEndpointAuthMethod: tokenEndpointAuthenticationMethod, initialAccessToken: nil, additionalParameters: additionalParameters)
+    public convenience init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: String?, additionalParameters: [String : String]?) {
+        self.init(configuration: configuration, redirectURIs: redirectURIs, postLogoutRedirectURIs: postLogoutRedirectURIs, clientName: clientName, responseTypes: responseTypes, grantTypes: grantTypes, subjectType: subjectType, tokenEndpointAuthMethod: tokenEndpointAuthenticationMethod, initialAccessToken: nil, additionalParameters: additionalParameters)
     }
     
-    public init(configuration: ProviderConfiguration, redirectURIs: [URL], clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: String?, initialAccessToken: String?, additionalParameters: [String : String]?) {
+    public init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: String?, initialAccessToken: String?, additionalParameters: [String : String]?) {
         
         self.configuration = configuration
         self.initialAccessToken = initialAccessToken
         self.redirectURIs = redirectURIs
+        self.postLogoutRedirectURIs = postLogoutRedirectURIs
         self.clientName = clientName
         self.responseTypes = responseTypes
         self.grantTypes = grantTypes
@@ -133,11 +141,13 @@ public class RegistrationRequest: NSObject {
     func JSONString() -> Data? {
         // Dictionary with several key/value pairs and the above array of arrays
         var dict: [AnyHashable : Any] = [:]
-        var redirectURIStrings = [String]()
-        for obj in redirectURIs {
-            redirectURIStrings.append(obj.absoluteString)
+
+        dict[kRedirectURIsParam] = redirectURIs.map { $0.absoluteString }
+        
+        if let postLogoutRedirectURIs = postLogoutRedirectURIs {
+            dict[kPostLogoutRedirectURIsParam] = postLogoutRedirectURIs.map { $0.absoluteString }
         }
-        dict[kRedirectURIsParam] = redirectURIStrings
+        
         dict[kApplicationTypeParam] = applicationType
         if additionalParameters != nil {
             // Add any additional parameters first to allow them
