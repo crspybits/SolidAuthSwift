@@ -1,6 +1,6 @@
 SolidAuthSwift
 
-Version 0.0.10
+Version 0.0.10 (9/12/21)
     Added some RDF parsing to attempt to get the storage IRI from the users profile, after sign in. See https://github.com/SyncServerII/ServerSolidAccount/issues/4
     Added logout functionality.
     Refactored the demo app UI code.
