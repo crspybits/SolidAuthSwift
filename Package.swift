@@ -30,7 +30,7 @@ let package = Package(
         .package(name: "SwiftJWT2", url: "https://github.com/crspybits/Swift-JWT2.git", from: "3.6.201"),
         
         .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0"),
-        .package(name: "SerdParser", url: "https://github.com/kasei/serd-parser", .branch("master"))
+        .package(name: "SerdParser", url: "https://github.com/kasei/serd-parser", from: "0.0.3")
     ],
     targets: [
         .target(

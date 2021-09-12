@@ -86,9 +86,9 @@
         "package": "SerdParser",
         "repositoryURL": "https://github.com/kasei/serd-parser",
         "state": {
-          "branch": "master",
+          "branch": null,
           "revision": "f40bf3794670aaa68415e408a257b63a9c6f37d5",
-          "version": null
+          "version": "0.0.3"
         }
       },
       {
