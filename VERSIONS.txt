@@ -4,6 +4,7 @@ Version 0.0.10
     Added some RDF parsing to attempt to get the storage IRI from the users profile, after sign in. See https://github.com/SyncServerII/ServerSolidAccount/issues/4
     Added logout functionality.
     Refactored the demo app UI code.
+    More progress on getting this code working with https://broker.pod.inrupt.com.
 
 Version 0.0.9 (8/18/21)
     Added toBase64() method.

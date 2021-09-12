@@ -22,6 +22,9 @@ public struct CodeParameters: ParametersBasics, Codable {
     public let redirectUri: String
     public let clientId: String
     
+    public let clientSecret: String
+    public let authenticationMethod: TokenEndpointAuthenticationMethod
+    
     // CodingKeys because I want to use this enum elsewhere.
     public enum CodingKeys: String, CodingKey {
         case tokenEndpoint
@@ -30,19 +33,23 @@ public struct CodeParameters: ParametersBasics, Codable {
         case code
         case redirectUri
         case clientId
+        case clientSecret
+        case authenticationMethod
     }
     
     public var grantType: String {
         "authorization_code"
     }
     
-    public init(tokenEndpoint: URL, jwksURL: URL, codeVerifier: String, code: String, redirectUri: String, clientId: String) {
+    public init(tokenEndpoint: URL, jwksURL: URL, codeVerifier: String, code: String, redirectUri: String, clientId: String, clientSecret: String, authenticationMethod: TokenEndpointAuthenticationMethod) {
         self.tokenEndpoint = tokenEndpoint
         self.codeVerifier = codeVerifier
         self.code = code
         self.redirectUri = redirectUri
         self.clientId = clientId
         self.jwksURL = jwksURL
+        self.clientSecret = clientSecret
+        self.authenticationMethod = authenticationMethod
     }
 }
 

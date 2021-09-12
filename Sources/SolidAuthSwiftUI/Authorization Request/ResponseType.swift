@@ -16,4 +16,8 @@ public enum ResponseType: String, Codable {
     static func toString(_ types: Set<ResponseType>) -> String {
         types.map { $0.rawValue}.joined(separator: " ")
     }
+    
+    static func toArray(_ types: Set<ResponseType>) -> [String] {
+        return types.map { $0.rawValue}
+    }
 }

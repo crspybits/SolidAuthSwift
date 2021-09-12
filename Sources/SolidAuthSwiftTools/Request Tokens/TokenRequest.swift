@@ -10,8 +10,25 @@ import Foundation
     import FoundationNetworking
 #endif
 
+public enum TokenEndpointAuthenticationMethod: String, Codable {
+    case basic = "client_secret_basic"
+    case post = "client_secret_post"
+    // Not implementing jwt yet. And not sure what to use for `TokenEndpointAuthenticationMethod` if I use the DPoP header as indicated in https://solid.github.io/solid-oidc/primer/#authorization-code-pkce-flow-step-14
+}
+
+extension TokenEndpointAuthenticationMethod {
+    // Use this for `TokenEndpointAuthenticationMethod` `basic`
+    // See "1.4. client_secret_basic" of https://darutk.medium.com/oauth-2-0-client-authentication-4b5f929305d4
+    // and section 3.1.3.1 of https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+    func basicAuthorizationHeaderValue(clientId: String, clientSecret: String) -> String {
+        let string = "\(clientId):\(clientSecret)"
+        let base64 = Data(string.utf8).base64EncodedString()
+        return "Basic \(base64)"
+    }
+}
+    
 // grant_type=authorization_code
-// See https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-14
+// https://solid.github.io/solid-oidc/primer/#authorization-code-pkce-flow-step-14
 
 // grant_type=refresh_token
 // See https://datatracker.ietf.org/doc/html/draft-ietf-oauth-dpop
@@ -35,6 +52,9 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
         case code
         case redirectUri = "redirect_uri"
         case clientId = "client_id"
+        case clientSecret = "client_secret"
+        case authorization
+        case contentType = "content-type"
     }
     
     let requestType: TokenRequestType
@@ -43,7 +63,8 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
     
     /**
      * Parameters:
-     *   requestType: You should first make a .code request and then as needed with the resulting refresh token, do .refresh requests when the access token expires.
+     *   requestType:
+     *      You should first make a .code request and then as needed with the resulting refresh token, do .refresh requests when the access token expires.
      *   jwk: The public key
      *   privateKey: The private key
      */
@@ -60,30 +81,43 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
                 completion(result)
             }
         }
-        
+                
         let httpMethod = "POST"
-        let bodyClaims = BodyClaims(htu: requestType.basics.tokenEndpoint.absoluteString, htm: httpMethod, jti: UUID().uuidString)
-        let dpop = DPoP(jwk: jwk, privateKey: privateKey, body: bodyClaims)
-        
-        let dpopHeader: String
-        
+
+        let bodyData: Data
         do {
-            dpopHeader = try dpop.generate()
+            bodyData = try self.body()
         } catch let error {
             callCompletion(.failure(error))
             return
         }
-
-        let bodyData = self.body()
         
         var request = URLRequest(url: requestType.basics.tokenEndpoint)
         request.httpMethod = httpMethod
         request.httpBody = bodyData
         
-        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "content-type")
-        request.addValue(dpopHeader, forHTTPHeaderField: DPoPHttpHeaderKey)
+        request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: Keys.contentType.rawValue)
+                
+        switch requestType.basics.authenticationMethod {
+        case .basic:
+            let headerValue = requestType.basics.authenticationMethod.basicAuthorizationHeaderValue(clientId: requestType.basics.clientId, clientSecret: requestType.basics.clientSecret)
+            request.addValue(headerValue, forHTTPHeaderField: Keys.authorization.rawValue)
+        case .post:
+            break
+        }
         
-        // print("request.allHTTPHeaderFields: \(String(describing: request.allHTTPHeaderFields))")
+        // Not sure what authentication method should cause this to happen.
+        /*
+        do {
+            try addDPoPHeader(to: &request, tokenEndpoint: requestType.basics.tokenEndpoint, httpMethod: httpMethod)
+        } catch let error {
+            callCompletion(.failure(error))
+            return
+        }
+        */
+        
+        print("request: \(String(describing: request.url))")
+        print("request.allHTTPHeaderFields: \(String(describing: request.allHTTPHeaderFields))")
 
         let session = URLSession(configuration: .default, delegate: nil, delegateQueue: nil)
         session.dataTask(with: request, completionHandler: { data, response, error in
@@ -97,14 +131,10 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
                 return
             }
             
-            // DEBUGGING
-//#if false
             if let data = data {
                 let str = String(data: data, encoding: .utf8)
                 print("String: \(String(describing: str))")
             }
-//#endif
-            // DEBUGGING
             
             guard NetworkingExtras.statusCodeOK(response.statusCode) else {
                 callCompletion(.failure(TokenRequestError.badStatusCode(response.statusCode)))
@@ -128,12 +158,21 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
         }).resume()
     }
 
-    func body() -> Data {
+    func body() throws -> Data {
         var values = [URLQueryItem]()
 
         values += [
             URLQueryItem(name: Keys.grantType.rawValue, value: requestType.basics.grantType),
         ]
+        
+        switch requestType.basics.authenticationMethod {
+        case .basic:
+            break
+        case .post:            
+            values += [
+                URLQueryItem(name: Keys.clientSecret.rawValue, value: requestType.basics.clientSecret),
+            ]
+        }
         
         switch requestType {
         case .code(let code):
@@ -175,3 +214,15 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
     }
 }
 
+extension TokenRequest {
+    func addDPoPHeader(to request: inout URLRequest, tokenEndpoint: URL, httpMethod: String) throws {
+        let htu = tokenEndpoint.absoluteString
+
+        let bodyClaims = BodyClaims(htu: htu, htm: httpMethod, jti: UUID().uuidString)
+        let dpop = DPoP(jwk: jwk, privateKey: privateKey, body: bodyClaims)
+
+        let dpopHeader = try dpop.generate()
+        
+        request.addValue(dpopHeader, forHTTPHeaderField: DPoPHttpHeaderKey)
+    }
+}

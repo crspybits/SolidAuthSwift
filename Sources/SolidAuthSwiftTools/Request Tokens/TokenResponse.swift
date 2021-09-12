@@ -7,6 +7,8 @@
 
 import Foundation
 
+// Some Solid servers change the refresh token every time a new access token is generated: "each time the refresh token is used, a new refresh token is emitted, and the previous one is invalidated." https://github.com/inrupt/solid-client-authn-js/issues/1285#issuecomment-823192309
+
 /*
 access_token": "eyJhbGciOiJ...": The access token we generated. The client will use this to authenticate with the server.
 "expires_in": 300: Tells the client that the access token will expire in 300 seconds (5 minutes)
@@ -27,11 +29,11 @@ public class TokenResponse: Codable {
 
 extension TokenResponse {
     // Only for use when the TokenRequest that generated the TokenResponse used a .code
-    public func createRefreshParameters(tokenEndpoint: URL, clientId: String) -> RefreshParameters? {
+    public func createRefreshParameters(params: CodeParameters) -> RefreshParameters? {
         guard let refresh_token = refresh_token else {
             return nil
         }
         
-        return RefreshParameters(tokenEndpoint: tokenEndpoint, refreshToken: refresh_token, clientId: clientId)
+        return RefreshParameters(tokenEndpoint: params.tokenEndpoint, refreshToken: refresh_token, clientId: params.clientId, clientSecret: params.clientSecret, authenticationMethod: params.authenticationMethod)
     }
 }

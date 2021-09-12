@@ -23,7 +23,7 @@ extension RegistrationRequest {
      * For ClientID's, see https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-6
      * and https://openid.net/specs/openid-connect-registration-1_0.html
      *
-     * 9/9/21: Apparently static registration is just in beta: "Solid Identity Provider support for WebID-based authentication for client applications is currently not widely available. Currently, only Inrupt’s Enterprise Solid Server (ESS) supports WebID-based authentication for client applications and only as a Beta feature." (https://docs.inrupt.com/developer-tools/javascript/client-libraries/tutorial/authenticate-client/)
+     * See also https://github.com/crspybits/SolidAuthSwift/issues/5
      *
      * Parameters:
      *  queue: The queue to use when calling the completion.

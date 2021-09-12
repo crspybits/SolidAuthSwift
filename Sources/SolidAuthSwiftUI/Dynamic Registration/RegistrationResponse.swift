@@ -26,7 +26,6 @@ public class RegistrationResponse: NSObject {
     public var clientSecretExpiresAt: Date?
     public var registrationAccessToken: String?
     public var registrationClientURI: URL?
-    public var tokenEndpointAuthenticationMethod: String?
     public var additionalParameters = [String : Any]()
     
     init(parameters: [String : Any]) {
@@ -54,8 +53,6 @@ public class RegistrationResponse: NSObject {
                     continue
                 }
                 registrationClientURI = URL(string: urlString)
-            case RegistrationAccessTokenParam:
-                tokenEndpointAuthenticationMethod = parameters[RegistrationAccessTokenParam] as? String
             default:
                 additionalParameters[parameter.key] = parameter.value
             }

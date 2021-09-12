@@ -19,25 +19,34 @@ class Client: ObservableObject {
     private let config = SignInConfiguration(
         // These work:
         // issuer: "https://inrupt.net",
-        issuer: "https://solidcommunity.net",
+        // issuer: "https://solidcommunity.net",
         
         // issuer: "https://pod.inrupt.com", // This fails with a 401
         
-        // This is failing too: https://github.com/crspybits/SolidAuthSwift/issues/3
-        // issuer: "https://broker.pod.inrupt.com",
+        // I'm able to sign in with this, and do a token request. But the token request isn't resulting in a refresh token so far. https://github.com/crspybits/SolidAuthSwift/issues/3
+        issuer: "https://broker.pod.inrupt.com",
         
         // This is failing: https://github.com/crspybits/SolidAuthSwift/issues/4
-        //issuer: "https://trinpod.us",
+        // issuer: "https://trinpod.us",
         
         redirectURI: redirect,
         postLogoutRedirectURI: redirect,
         clientName: "Neebla",
-        scopes: [.openid, .profile, .webid, .offlineAccess],
+        
+        // This works with https://inrupt.net, https://solidcommunity.net, and https://broker.pod.inrupt.com
+        scopes: [.openid, .profile, .webid, .offlineAccess],        
         
         // With `https://solidcommunity.net` if I use:
         //      responseTypes:  [.code, .token]
         // I get: unsupported_response_type
-        responseTypes:  [.code, .idToken])
+        
+        // This works with "https://inrupt.net", and "https://solidcommunity.net",
+        // responseTypes:  [.code, .idToken],
+
+        responseTypes:  [.code],
+
+        authenticationMethod: .basic
+    )
 
     private var controller: SignInController!
     

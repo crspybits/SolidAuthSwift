@@ -44,7 +44,7 @@ class Server: ObservableObject {
                 
                 logger.debug("SUCCESS: On TokenRequest")
                 
-                guard let refreshParams = response.createRefreshParameters(tokenEndpoint: params.tokenEndpoint, clientId: params.clientId) else {
+                guard let refreshParams = response.createRefreshParameters(params: params) else {
                     logger.error("ERROR: Failed to create refresh parameters")
                     return
                 }

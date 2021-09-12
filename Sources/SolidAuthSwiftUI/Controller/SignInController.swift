@@ -37,10 +37,11 @@ public class SignInController {
     var request:RegistrationRequest!
     var completion: ((Result<SignInController.Response, Error>)-> Void)!
     var queue: DispatchQueue!
-    
+    var clientSecret: String!
+
     public var auth:Authorization!
     public var providerConfig: ProviderConfiguration!
-    
+
     // Retain the instance you make, before calling `start`, because this class does async operations.
     public init(config: SignInConfiguration) throws {
         guard let redirectURI = URL(string: config.redirectURI) else {
@@ -64,7 +65,7 @@ public class SignInController {
 
     /**
      *  Starts off sequence:
-     *      1) Fetch configuration
+     *      1) Discovery: Fetch configuration
      *      2) Client registration
      *      3) Authorization request
      *      4) Attempt to get storage IRI
@@ -110,8 +111,9 @@ public class SignInController {
             responseTypes: self.config.responseTypes,
             grantTypes: ["authorization_code"],
             subjectType: nil,
-            tokenEndpointAuthMethod: "client_secret_post",
+            tokenEndpointAuthMethod: self.config.authenticationMethod,
             additionalParameters: nil)
+            
         request.send(queue: queue) { [weak self] result in
             guard let self = self else { return }
             
@@ -127,6 +129,8 @@ public class SignInController {
                     return
                 }
                 
+                self.clientSecret = response.clientSecret
+
                 self.authorizationRequest(config: config, clientID: clientID)
             }
         }
@@ -233,6 +237,10 @@ public class SignInController {
             throw ControllerError.generateParameters("Could not get clientID")
         }
         
-        return CodeParameters(tokenEndpoint: tokenEndpoint, jwksURL: jwksURL, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId)
+        guard let clientSecret = clientSecret else {
+            throw ControllerError.generateParameters("Could not get clientSecret")
+        }
+
+        return CodeParameters(tokenEndpoint: tokenEndpoint, jwksURL: jwksURL, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId, clientSecret: clientSecret, authenticationMethod: config.authenticationMethod)
     }
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SolidAuthSwiftTools
 
 fileprivate let kConfigurationKey = "configuration"
 fileprivate let kInitialAccessToken = "initial_access_token"
@@ -32,6 +33,13 @@ public class RegistrationRequest: NSObject {
      Configurations may be created manually, or via an OpenID Connect Discovery Document.
      */
     let configuration: ProviderConfiguration
+
+    /*! @brief Name of the Client to be presented to the End-User.
+     @remarks client_name
+     @see https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
+     */
+    let clientName: String?
+
     /*! @brief The initial access token to access the Client Registration Endpoint
      (if required by the OpenID Provider).
      @remarks OAuth 2.0 Access Token optionally issued by an Authorization Server granting
@@ -40,19 +48,14 @@ public class RegistrationRequest: NSObject {
      @see Section 3 of OpenID Connect Dynamic Client Registration 1.0
      https://openid.net/specs/openid-connect-registration-1_0.html#ClientRegistration
      */
-
-    /*! @brief Name of the Client to be presented to the End-User.
-     @remarks client_name
-     @see https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
-     */
-    let clientName: String?
-     
     let initialAccessToken: String?
+    
     /*! @brief The application type to register, will always be 'native'.
      @remarks application_type
      @see https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
      */
     let applicationType: String
+    
     /*! @brief The client's redirect URI's.
      @remarks redirect_uris
      @see https://tools.ietf.org/html/rfc6749#section-3.1.2
@@ -74,25 +77,28 @@ public class RegistrationRequest: NSObject {
      @see https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
      */
     let grantTypes: [String]?
+    
     /*! @brief The subject type to to request.
      @remarks subject_type
      @see http://openid.net/specs/openid-connect-core-1_0.html#SubjectIDTypes
      */
     let subjectType: String?
+    
     /*! @brief The client authentication method to use at the token endpoint.
      @remarks token_endpoint_auth_method
      @see http://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
      */
-    let tokenEndpointAuthenticationMethod: String?
+    let tokenEndpointAuthenticationMethod: TokenEndpointAuthenticationMethod?
+    
     /*! @brief The client's additional token request parameters.
      */
     let additionalParameters: [String : String]?
     
-    public convenience init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: String?, additionalParameters: [String : String]?) {
+    public convenience init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: TokenEndpointAuthenticationMethod?, additionalParameters: [String : String]?) {
         self.init(configuration: configuration, redirectURIs: redirectURIs, postLogoutRedirectURIs: postLogoutRedirectURIs, clientName: clientName, responseTypes: responseTypes, grantTypes: grantTypes, subjectType: subjectType, tokenEndpointAuthMethod: tokenEndpointAuthenticationMethod, initialAccessToken: nil, additionalParameters: additionalParameters)
     }
     
-    public init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: String?, initialAccessToken: String?, additionalParameters: [String : String]?) {
+    public init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: TokenEndpointAuthenticationMethod?, initialAccessToken: String?, additionalParameters: [String : String]?) {
         
         self.configuration = configuration
         self.initialAccessToken = initialAccessToken
@@ -155,7 +161,7 @@ public class RegistrationRequest: NSObject {
             for (k, v) in additionalParameters! { dict[k] = v }
         }
         if responseTypes.count > 0 {
-            dict[kResponseTypesParam] = ResponseType.toString(responseTypes)
+            dict[kResponseTypesParam] = ResponseType.toArray(responseTypes)
         }
         if grantTypes != nil {
             dict[kGrantTypesParam] = grantTypes
@@ -166,8 +172,9 @@ public class RegistrationRequest: NSObject {
         if let clientName = clientName {
             dict[kClientNameParam] = clientName
         }
-        if tokenEndpointAuthenticationMethod != nil {
-            dict[kTokenEndpointAuthenticationMethodParam] = tokenEndpointAuthenticationMethod
+        
+        if let tokenEndpointAuthenticationMethod = tokenEndpointAuthenticationMethod {
+            dict[kTokenEndpointAuthenticationMethodParam] = tokenEndpointAuthenticationMethod.rawValue
         }
         
         logger.debug("JSONString: dict: \(dict)")
