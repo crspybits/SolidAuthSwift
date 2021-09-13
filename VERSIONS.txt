@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.12 (9/12/21)
+    Add https to RDF parsing in "/" storage case.
+    
 Version 0.0.11 (9/12/21)
     Update to SerdParser 0.0.3.
     

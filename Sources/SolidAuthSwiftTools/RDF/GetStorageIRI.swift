@@ -108,7 +108,7 @@ public class GetStorageIRI {
                 throw GetStorageIRIError.noWebIdHost
             }
             
-            guard let result = URL(string: host) else {
+            guard let result = URL(string: "https://" + host) else {
                 throw GetStorageIRIError.badURLForSpaceStorageIRI
             }
             
