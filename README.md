@@ -35,26 +35,37 @@ class Client: ObservableObject {
     
     private let config = SignInConfiguration(
         // These work:
-        // issuer: "https://inrupt.net",
-        issuer: "https://solidcommunity.net",
-        
-        // issuer: "https://pod.inrupt.com", // This fails with a 401
-        
-        // This is failing too: https://github.com/crspybits/SolidAuthSwift/issues/3
+        issuer: "https://inrupt.net",
+        // issuer: "https://solidcommunity.net",
         // issuer: "https://broker.pod.inrupt.com",
         
         // This is failing: https://github.com/crspybits/SolidAuthSwift/issues/4
-        //issuer: "https://trinpod.us",
+        // issuer: "https://trinpod.us",
         
         redirectURI: redirect,
         postLogoutRedirectURI: redirect,
         clientName: "Neebla",
-        scopes: [.openid, .profile, .webid, .offlineAccess],
+        
+        // This works with https://inrupt.net, https://solidcommunity.net, and https://broker.pod.inrupt.com
+        scopes: [.openid, .profile, .webid, .offlineAccess],        
         
         // With `https://solidcommunity.net` if I use:
         //      responseTypes:  [.code, .token]
         // I get: unsupported_response_type
-        responseTypes:  [.code, .idToken])
+        
+        // This works with "https://inrupt.net", and "https://solidcommunity.net",
+        // responseTypes:  [.code, .idToken],
+
+        responseTypes:  [.code],
+        
+        // This results in a refresh token with https://inrupt.net, https://solidcommunity.net, but not with https://broker.pod.inrupt.com
+        // grantTypes: [.authorizationCode],
+        
+        // This results in a refresh token with https://inrupt.net, https://solidcommunity.net, and https://broker.pod.inrupt.com
+        grantTypes: [.authorizationCode, .refreshToken],
+
+        authenticationMethod: .basic
+    )
 
     private var controller: SignInController!
     
@@ -115,7 +126,7 @@ i.e., you don't get any prompt beyond [this initial one](./Docs/README/InitialPr
 I thought originally this was to do with the requested response type, but it seems independent of that.
 Note that I *am* successfully getting a `AuthorizationResponse` in this case despite the lack of a seond prompt.
 
-#### Not getting app name showing up on sign in screen.
+#### With some issuers, not getting app name showing up on sign in screen.
 Despite having added "client_name" to the registration request, I'm still seeing [this](./Docs/README/AuthorizeNull.png).
 
 ### To be implemented
@@ -123,11 +134,11 @@ Despite having added "client_name" to the registration request, I'm still seeing
 
 ## SolidAuthSwiftTools
 
-This is intended to be used from a custom server. It is separated out from the `SolidAuthSwiftUI` library because `SolidAuthSwiftUI` contains UIKit code, and will *not* work on Linux.
+I had originally intended this to be used only from a custom server. It is separated out from the `SolidAuthSwiftUI` library because `SolidAuthSwiftUI` contains UIKit code, and will *not* work on Linux.
 
-Also there is a security issue: I'm designing for the specific use case where the key pair (needed to generate DPoP tokens) is stored on a custom server only. The key pair will *not* be present on the iOS client app.
+Also I had thought there was a security issue, that a private/public keypair (needed to generate DPoP tokens) could not securely be stored on the iOS client. [However, if the keypair is generated on the client, that doesn't seem true!](https://github.com/crspybits/SolidAuthSwift/issues/2). Thanks @wrmack for pointing this out.
 
- The server I'm considering is running on Linux. Note that this is not a Solid Pod. It's a custom server that will be making requests of a Solid Pod.
+(The terminology below still reads "Server", reflecting my main use case; I just need to edit this another day).
 
 ### Usage example (see SolidAuthDemoApp)
 

@@ -18,13 +18,9 @@ class Client: ObservableObject {
     
     private let config = SignInConfiguration(
         // These work:
-        // issuer: "https://inrupt.net",
+        issuer: "https://inrupt.net",
         // issuer: "https://solidcommunity.net",
-        
-        // issuer: "https://pod.inrupt.com", // This fails with a 401
-        
-        // I'm able to sign in with this, and do a token request. But the token request isn't resulting in a refresh token so far. https://github.com/crspybits/SolidAuthSwift/issues/3
-        issuer: "https://broker.pod.inrupt.com",
+        // issuer: "https://broker.pod.inrupt.com",
         
         // This is failing: https://github.com/crspybits/SolidAuthSwift/issues/4
         // issuer: "https://trinpod.us",
@@ -44,6 +40,12 @@ class Client: ObservableObject {
         // responseTypes:  [.code, .idToken],
 
         responseTypes:  [.code],
+        
+        // This results in a refresh token with https://inrupt.net, https://solidcommunity.net, but not with https://broker.pod.inrupt.com
+        // grantTypes: [.authorizationCode],
+        
+        // This results in a refresh token with https://inrupt.net, https://solidcommunity.net, and https://broker.pod.inrupt.com
+        grantTypes: [.authorizationCode, .refreshToken],
 
         authenticationMethod: .basic
     )

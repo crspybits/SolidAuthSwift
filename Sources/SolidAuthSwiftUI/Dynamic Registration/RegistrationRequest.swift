@@ -72,11 +72,12 @@ public class RegistrationRequest: NSObject {
      @see http://openid.net/specs/openid-connect-core-1_0.html#Authentication
      */
     let responseTypes: Set<ResponseType>
+    
     /*! @brief The grant types to register for usage by this client.
      @remarks grant_types
      @see https://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata
      */
-    let grantTypes: [String]?
+    let grantTypes: Set<GrantType>
     
     /*! @brief The subject type to to request.
      @remarks subject_type
@@ -94,11 +95,11 @@ public class RegistrationRequest: NSObject {
      */
     let additionalParameters: [String : String]?
     
-    public convenience init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: TokenEndpointAuthenticationMethod?, additionalParameters: [String : String]?) {
+    public convenience init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: Set<GrantType>, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: TokenEndpointAuthenticationMethod?, additionalParameters: [String : String]?) {
         self.init(configuration: configuration, redirectURIs: redirectURIs, postLogoutRedirectURIs: postLogoutRedirectURIs, clientName: clientName, responseTypes: responseTypes, grantTypes: grantTypes, subjectType: subjectType, tokenEndpointAuthMethod: tokenEndpointAuthenticationMethod, initialAccessToken: nil, additionalParameters: additionalParameters)
     }
     
-    public init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: [String]?, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: TokenEndpointAuthenticationMethod?, initialAccessToken: String?, additionalParameters: [String : String]?) {
+    public init(configuration: ProviderConfiguration, redirectURIs: [URL], postLogoutRedirectURIs: [URL]? = nil, clientName: String?, responseTypes: Set<ResponseType>, grantTypes: Set<GrantType>, subjectType: String?, tokenEndpointAuthMethod tokenEndpointAuthenticationMethod: TokenEndpointAuthenticationMethod?, initialAccessToken: String?, additionalParameters: [String : String]?) {
         
         self.configuration = configuration
         self.initialAccessToken = initialAccessToken
@@ -163,8 +164,8 @@ public class RegistrationRequest: NSObject {
         if responseTypes.count > 0 {
             dict[kResponseTypesParam] = ResponseType.toArray(responseTypes)
         }
-        if grantTypes != nil {
-            dict[kGrantTypesParam] = grantTypes
+        if grantTypes.count > 0 {
+            dict[kGrantTypesParam] = GrantType.toArray(grantTypes)
         }
         if subjectType != nil {
             dict[kSubjectTypeParam] = subjectType

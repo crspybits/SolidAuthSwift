@@ -46,6 +46,8 @@ public struct SignInConfiguration {
     // e.g., [.code, .token]
     let responseTypes: Set<ResponseType>
     
+    let grantTypes: Set<GrantType>
+    
     let authenticationMethod: TokenEndpointAuthenticationMethod
     
     // Can be used to provide context when presenting the sign in screen.
@@ -53,13 +55,14 @@ public struct SignInConfiguration {
     
     // TODO: Enable presentationContextProvider for signout as well.
     
-    public init(issuer: String, redirectURI: String, postLogoutRedirectURI: String? = nil, clientName: String, scopes: Set<Scope>, responseTypes: Set<ResponseType>, authenticationMethod: TokenEndpointAuthenticationMethod, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil) {
+    public init(issuer: String, redirectURI: String, postLogoutRedirectURI: String? = nil, clientName: String, scopes: Set<Scope>, responseTypes: Set<ResponseType>, grantTypes: Set<GrantType>, authenticationMethod: TokenEndpointAuthenticationMethod, presentationContextProvider: ASWebAuthenticationPresentationContextProviding? = nil) {
         self.issuer = issuer
         self.redirectURI = redirectURI
         self.postLogoutRedirectURI = postLogoutRedirectURI
         self.clientName = clientName
         self.scopes = scopes
         self.responseTypes = responseTypes
+        self.grantTypes = grantTypes
         self.authenticationMethod = authenticationMethod
         self.presentationContextProvider = presentationContextProvider
     }

@@ -24,7 +24,7 @@ class Server: ObservableObject {
         } catch let error {
             logger.error("Could not decode JWK: \(error)")
             return
-        }    
+        }
     }
     
     // I'm planning to do this request on the server: Because I don't want to have the encryption private key on the iOS client. But it's easier for now to do a test on iOS.

@@ -109,7 +109,7 @@ public class SignInController {
             postLogoutRedirectURIs: postLogoutRedirectURIs,
             clientName: self.config.clientName,
             responseTypes: self.config.responseTypes,
-            grantTypes: ["authorization_code"],
+            grantTypes: self.config.grantTypes,
             subjectType: nil,
             tokenEndpointAuthMethod: self.config.authenticationMethod,
             additionalParameters: nil)
