@@ -108,18 +108,13 @@ class Client: ObservableObject {
             return
         }
         
-        guard let endSessionEndpoint = controller.providerConfig.endSessionEndpoint else {
-            logger.error("Can't logout: No endSessionEndpoint")
-            return
-        }
-        
-        logoutRequest = LogoutRequest(idToken: idToken, endSessionEndpoint: endSessionEndpoint, config: config)
-        logoutRequest.send { error in
+        controller.logout(idToken: idToken) { error in
             if let error = error {
-                logger.error("Failed logout: \(error)")
-                return
+                logger.debug("Logout: Error: \(error)")
             }
-            logger.debug("Logout: SUCCESS!!")
+            else {
+                logger.debug("Logout: SUCCESS!!")
+            }
         }
     }
 }

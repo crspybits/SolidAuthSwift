@@ -40,6 +40,7 @@ public class SignInController {
     var completion: ((Result<SignInController.Response, Error>)-> Void)!
     var queue: DispatchQueue!
     var clientSecret: String!
+    var logoutRequest:LogoutRequest!
 
     public var auth:Authorization!
     public var providerConfig: ProviderConfiguration!
