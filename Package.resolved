@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Flight-School/AnyCodable.git",
         "state": {
           "branch": null,
-          "revision": "69261f239f0fffaf51495dadc4f8483fbfe97025",
-          "version": "0.6.1"
+          "revision": "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
+          "version": "0.6.2"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/vapor/jwt-kit.git",
         "state": {
           "branch": null,
-          "revision": "df7955305940ea0fcd1626a0a6d1a1556623f95e",
-          "version": "4.2.3"
+          "revision": "7a9a04df93e71de10fa2e8d6e9430dd0a7924643",
+          "version": "4.2.4"
         }
       },
       {
@@ -62,6 +62,24 @@
           "branch": null,
           "revision": "e82d34eab3f0b05391082b11ea07d3b70d2f65bb",
           "version": "1.9.200"
+        }
+      },
+      {
+        "package": "OpenSSL",
+        "repositoryURL": "https://github.com/Kitura/OpenSSL.git",
+        "state": {
+          "branch": null,
+          "revision": "80b04f33b086fc90e28d9ae159d43705fb348e16",
+          "version": "2.2.200"
+        }
+      },
+      {
+        "package": "SerdParser",
+        "repositoryURL": "https://github.com/kasei/serd-parser",
+        "state": {
+          "branch": null,
+          "revision": "f40bf3794670aaa68415e408a257b63a9c6f37d5",
+          "version": "0.0.3"
         }
       },
       {
@@ -89,6 +107,15 @@
           "branch": null,
           "revision": "5d66f7ba25daf4f94100e7022febf3c75e37a6c7",
           "version": "1.4.2"
+        }
+      },
+      {
+        "package": "Cserd",
+        "repositoryURL": "https://github.com/kasei/swift-serd.git",
+        "state": {
+          "branch": null,
+          "revision": "437506d3a0a1e960f7c6fcbf3e51fda84d65c4ec",
+          "version": "0.0.4"
         }
       }
     ]

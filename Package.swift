@@ -39,6 +39,7 @@ let package = Package(
                 .product(name: "Logging", package: "swift-log"),
                 "AnyCodable",
                 "SolidAuthSwiftTools",
+                "SerdParser",
             ],
             path: "Sources/SolidAuthSwiftUI"),
         .target(
@@ -46,7 +47,6 @@ let package = Package(
             dependencies: [
                 "SwiftJWT2",
                 "AnyCodable",
-                "SerdParser",
                 .product(name: "JWTKit", package: "jwt-kit"),
             ],
             path: "Sources/SolidAuthSwiftTools"),

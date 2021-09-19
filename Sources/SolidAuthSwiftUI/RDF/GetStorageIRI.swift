@@ -10,6 +10,8 @@ import SerdParser
 
 // The purpose of this class is to get the default storage "host URL" given a users webid. I'm not sure storage "host URL" is the right term, but I mean the base URL to use when forming requests to a users Pod. See also discussion here: https://github.com/SyncServerII/ServerSolidAccount/issues/4
 
+// I'm putting this in the iOS specific code because I've not been able to get `SerdParser` to build on Linux: https://github.com/kasei/serd-parser/issues/3
+
 public class GetStorageIRI {
     enum GetStorageIRIError: Error {
         case noHTTPURLResponse
