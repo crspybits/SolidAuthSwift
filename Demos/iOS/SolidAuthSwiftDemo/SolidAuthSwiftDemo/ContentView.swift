@@ -62,7 +62,15 @@ struct ContentView: View {
                     }
                 }
                 .disabled(!client.initialized || client.response == nil)
-        
+
+                DemoButton(spacerHeight: spacerHeight, text: "Request user info") {
+                    if let accessToken = client.accessToken,
+                        let providerConfig = client.controller.providerConfig {
+                        server.requestUserInfo(accessToken: accessToken, configuration: providerConfig)
+                    }
+                }
+                .disabled(!client.initialized || client.response == nil)
+                
                 DemoButton(spacerHeight: spacerHeight, text: "Refresh tokens") {
                     if let refreshParams = server.refreshParams {
                         server.refreshTokens(params: refreshParams)

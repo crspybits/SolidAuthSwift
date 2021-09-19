@@ -15,6 +15,7 @@ class Server: ObservableObject {
     @Published var refreshParams: RefreshParameters?
     var jwksRequest: JwksRequest!
     var tokenResponse: TokenResponse!
+    var userInfoRequest: UserInfoRequest!
     
     init() {
     }
@@ -63,6 +64,24 @@ class Server: ObservableObject {
                 }
                 
                 logger.debug("SUCCESS: validated token!")
+            }
+        }
+    }
+    
+    func requestUserInfo(accessToken: String, configuration: ProviderConfiguration) {
+        do {
+            userInfoRequest = try UserInfoRequest(accessToken: accessToken, configuration: configuration)
+        } catch let error {
+            logger.error("Error: \(error)")
+            return
+        }
+        
+        userInfoRequest.send { result in
+            switch result {
+            case .success(let response):
+                logger.info("Response: \(response)")
+            case .failure(let error):
+                logger.error("\(error)")
             }
         }
     }

@@ -18,9 +18,9 @@ class Client: ObservableObject {
     
     private let config = SignInConfiguration(
         // These work:
-        // issuer: "https://inrupt.net",
-        issuer: "https://solidcommunity.net",
-        //issuer: "https://broker.pod.inrupt.com",
+        //issuer: "https://inrupt.net",
+        //issuer: "https://solidcommunity.net",
+        issuer: "https://broker.pod.inrupt.com",
         
         // This is failing: https://github.com/crspybits/SolidAuthSwift/issues/4
         // issuer: "https://trinpod.us",
@@ -53,7 +53,7 @@ class Client: ObservableObject {
         // authenticationMethod: .none
     )
 
-    private var controller: SignInController!
+    var controller: SignInController!
 
     var accessToken: String? {
         guard let response = self.response else {

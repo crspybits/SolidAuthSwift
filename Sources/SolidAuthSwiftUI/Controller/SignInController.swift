@@ -27,6 +27,7 @@ public class SignInController {
         case noTokens
         case noAuthorizationResponse
         case noJwksURL
+        case noWebId
     }
     
     let authConfig: AuthorizationConfiguration
@@ -72,7 +73,8 @@ public class SignInController {
      *      2) Client registration
      *      3) Authorization request
      *      4) Get refresh token and id token
-     *      5) Attempt to get storage IRI
+     *      5) Get the users webid
+     *      6) Attempt to get storage IRI
      */
     public func start(queue: DispatchQueue = .main, completion: @escaping (Result<SignInController.Response, Error>)-> Void) {
         self.completion = completion
@@ -174,6 +176,13 @@ public class SignInController {
         }
     }
     
+    struct StorageIRIParameters {
+        let authorizationResponse: AuthorizationResponse
+        let idToken: String
+        let accessToken: String
+        let refreshParameters: RefreshParameters
+    }
+    
     // Get refresh token and an id token.
     func requestTokens(params:CodeParameters) {
         tokenRequest = TokenRequest(requestType: .code(params))
@@ -197,49 +206,55 @@ public class SignInController {
                     return
                 }
                 
-                self.getStorageIRI(response: authorizationResponse, idToken: idToken, accessToken: accessToken, refreshParameters: refreshParameters)
+                let parameters = StorageIRIParameters(authorizationResponse: authorizationResponse, idToken: idToken, accessToken: accessToken, refreshParameters: refreshParameters)
+                self.getWebId(parameters:parameters)
             }
         }
     }
+    
+    func getWebId(parameters:StorageIRIParameters) {
+        let token: Token
+        do {
+            // This doesn't check the signature of the id token; just want to pull out the webid early.
+            token = try Token(parameters.idToken)
+        } catch let error {
+            callCompletion(.failure(error))
+            return
+        }
+        
+        // For method of obtaining a webid, see https://github.com/crspybits/SolidAuthSwift/issues/7
+        guard let webid = token.claims.webid ?? token.claims.sub,
+            let webidURL = URL(string: webid) else {
+            
+            // I'd like to make a user info request as a fallback, but that's not behaving the way I'd like. See UserInfoRequest.swift.
+            callCompletion(.failure(ControllerError.noWebId))
+            return
+        }
+        
+        logger.debug("token.claims.sub: \(String(describing: token.claims.sub))")
+        logger.debug("token.claims.webid: \(String(describing: token.claims.webid))")
+        
+        getStorageIRI(webidURL: webidURL, parameters: parameters)
+    }
 
-    func getStorageIRI(response: AuthorizationResponse, idToken: String, accessToken: String, refreshParameters: RefreshParameters) {
+    func getStorageIRI(webidURL: URL, parameters:StorageIRIParameters) {
         guard let jwksURL = providerConfig?.jwksURL else {
             callCompletion(.failure(ControllerError.noJwksURL))
             return
         }
         
         func returnEarly() {
-            let serverParameters = ServerParameters(refresh: refreshParameters, storageIRI: nil, jwksURL: jwksURL)
-            let result = Response(authResponse: response, parameters: serverParameters, idToken: idToken, accessToken: accessToken)
+            let serverParameters = ServerParameters(refresh: parameters.refreshParameters, storageIRI: nil, jwksURL: jwksURL, webid: webidURL.absoluteString)
+            let result = Response(authResponse: parameters.authorizationResponse, parameters: serverParameters, idToken: parameters.idToken, accessToken: parameters.accessToken)
             callCompletion(.success(result))
-        }
-
-        let token: Token
-        do {
-            // This doesn't check the signature of the id token; just want to pull out the webid early.
-            token = try Token(idToken)
-        } catch let error {
-            callCompletion(.failure(error))
-            return
-        }
-        
-        // I'm getting a nil webid in the id token in token.claims.webid, so using token.claims.sub instead.
-        guard let webid = token.claims.sub else {
-            returnEarly()
-            return
-        }
-        
-        guard let webidURL = URL(string: webid) else {
-            returnEarly()
-            return
         }
 
         getStorageIRI = GetStorageIRI(webid: webidURL)
         getStorageIRI.get { result in
             switch result {
             case .success(let url):
-                let serverParameters = ServerParameters(refresh: refreshParameters, storageIRI: url, jwksURL: jwksURL)
-                let result = Response(authResponse: response, parameters: serverParameters, idToken: idToken, accessToken: accessToken)
+                let serverParameters = ServerParameters(refresh: parameters.refreshParameters, storageIRI: url, jwksURL: jwksURL, webid: webidURL.absoluteString)
+                let result = Response(authResponse: parameters.authorizationResponse, parameters: serverParameters, idToken: parameters.idToken, accessToken: parameters.accessToken)
                 self.callCompletion(.success(result))
 
             case .failure(let error):

@@ -23,9 +23,15 @@ public struct ServerParameters: Codable {
     // This is needed on the server to verify the id token.
     public let jwksURL: URL
     
-    public init(refresh: RefreshParameters, storageIRI: URL?, jwksURL: URL) {
+    // See https://github.com/solid/webid-oidc-spec#deriving-webid-uri-from-id-token
+    // and https://solidproject.org/faqs#what-is-a-webid
+    // I'm making this non-optional so that a server can be assured to have a unique way to identify Solid users.
+    public let webid: String
+    
+    public init(refresh: RefreshParameters, storageIRI: URL?, jwksURL: URL, webid: String) {
         self.refresh = refresh
         self.storageIRI = storageIRI
         self.jwksURL = jwksURL
+        self.webid = webid
     }
 }

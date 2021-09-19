@@ -1,5 +1,9 @@
 SolidAuthSwift
 
+Version 0.0.17 (9/19/21)
+    Added non-optional webid to ServerParameters.
+    Added code for user info request.
+    
 Version 0.0.16 (9/19/21)
     Moved `func from(fromBase64` to a Decodable extension.
     
