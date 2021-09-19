@@ -18,9 +18,9 @@ class Client: ObservableObject {
     
     private let config = SignInConfiguration(
         // These work:
-        issuer: "https://inrupt.net",
-        // issuer: "https://solidcommunity.net",
-        // issuer: "https://broker.pod.inrupt.com",
+        // issuer: "https://inrupt.net",
+        issuer: "https://solidcommunity.net",
+        //issuer: "https://broker.pod.inrupt.com",
         
         // This is failing: https://github.com/crspybits/SolidAuthSwift/issues/4
         // issuer: "https://trinpod.us",
@@ -48,10 +48,29 @@ class Client: ObservableObject {
         grantTypes: [.authorizationCode, .refreshToken],
 
         authenticationMethod: .basic
+        
+        // TESTING
+        // authenticationMethod: .none
     )
 
     private var controller: SignInController!
-    
+
+    var accessToken: String? {
+        guard let response = self.response else {
+            return nil
+        }
+
+        return response.accessToken
+    }
+
+    var idToken: String? {
+        guard let response = self.response else {
+            return nil
+        }
+
+        return response.idToken
+    }
+
     init() {        
         guard let controller = try? SignInController(config: config) else {
             logger.error("Could not initialize Controller")
@@ -62,13 +81,14 @@ class Client: ObservableObject {
         self.initialized = true
     }
     
-    func start() {
+    func start(completion: @escaping (RefreshParameters?)->()) {
         controller.start() { [weak self] result in
             guard let self = self else { return }
             
             switch result {
             case .failure(let error):
                 logger.error("Sign In Controller failed: \(error)")
+                completion(nil)
                 
             case .success(let response):
                 logger.debug("**** Sign In Controller succeeded ****: \(response)")
@@ -76,12 +96,14 @@ class Client: ObservableObject {
                 // Save the response locally. Just for testing. In my actual app this will involve sending the client response to my custom server.
                 self.response = response
                 logger.debug("Controller response: \(response)")
+                
+                completion(response.parameters.refresh)
             }
         }
     }
     
     func logout() {
-        guard let idToken = response?.authResponse.idToken else {
+        guard let idToken = idToken else {
             logger.error("Can't logout: No idToken")
             return
         }

@@ -36,7 +36,7 @@ public class LogoutRequest: NSObject {
     var queue: DispatchQueue!
     
     /* Parameters:
-        - idToken: From the AuthorizationResponse
+        - idToken: This can be from the AuthorizationResponse or from an explicit token request.
         - endSessionEndpoint: From the ProviderConfiguration
         - config: The SignInConfiguration; This *must* have a `postLogoutRedirectURL`.
         - presentationContextProvider: To customize the ASWebAuthenticationPresentationContextProviding if wanted.

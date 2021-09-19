@@ -10,8 +10,6 @@ import UIKit
 import AuthenticationServices
 import SolidAuthSwiftTools
 
-fileprivate let kGrantTypeAuthorizationCode = "authorization_code"
-
 // Needs to be subclass of NSObject for `ASWebAuthenticationPresentationContextProviding` conformanace.
 
 public class Authorization: NSObject {

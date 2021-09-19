@@ -15,18 +15,18 @@ import SolidAuthSwiftTools
 public class SignInController {
     public struct Response: Codable {
         public let authResponse: AuthorizationResponse
-        public let parameters: CodeParameters
-        
-        // This should be something like "https://crspybits.trinpod.us", "https://crspybits.inrupt.net", or "https://pod.inrupt.com/crspybits".
-        // Aka. host URL; see https://github.com/SyncServerII/ServerSolidAccount/issues/4
-        // If this is nil (i.e., it could not be obtained here), and your app needs it, you'll need to prompt the user for it. If it is not nil, you might want to confirm the specific storage location your app plans to use with the user anyways. E.g., your app might want to use "https://pod.inrupt.com/crspybits/YourAppPath/".
-        public let storageIRI: URL?
+        public let parameters: ServerParameters
+        public let idToken: String
+        public let accessToken: String
     }
     
     enum ControllerError: Error {
         case badRedirectURIString
         case noClientId
         case generateParameters(String)
+        case noTokens
+        case noAuthorizationResponse
+        case noJwksURL
     }
     
     let authConfig: AuthorizationConfiguration
@@ -35,13 +35,15 @@ public class SignInController {
     let config: SignInConfiguration
     var getStorageIRI: GetStorageIRI!
     var request:RegistrationRequest!
+    var tokenRequest:TokenRequest<JWK_RSA>!
+    var authorizationResponse:AuthorizationResponse!
     var completion: ((Result<SignInController.Response, Error>)-> Void)!
     var queue: DispatchQueue!
     var clientSecret: String!
 
     public var auth:Authorization!
     public var providerConfig: ProviderConfiguration!
-
+    
     // Retain the instance you make, before calling `start`, because this class does async operations.
     public init(config: SignInConfiguration) throws {
         guard let redirectURI = URL(string: config.redirectURI) else {
@@ -68,7 +70,8 @@ public class SignInController {
      *      1) Discovery: Fetch configuration
      *      2) Client registration
      *      3) Authorization request
-     *      4) Attempt to get storage IRI
+     *      4) Get refresh token and id token
+     *      5) Attempt to get storage IRI
      */
     public func start(queue: DispatchQueue = .main, completion: @escaping (Result<SignInController.Response, Error>)-> Void) {
         self.completion = completion
@@ -159,8 +162,10 @@ public class SignInController {
                 self.callCompletion(.failure(error))
                 
             case .success(let response):
+                self.authorizationResponse = response
                 do {
-                    try self.getStorageIRI(response: response)
+                    let params = try self.prepRequestParameters(response: response)
+                    self.requestTokens(params:params)
                 } catch let error {
                     self.callCompletion(.failure(error))
                 }
@@ -168,30 +173,63 @@ public class SignInController {
         }
     }
     
-    // On success, this will do the `callCompletion`, but not on a throw
-    func getStorageIRI(response: AuthorizationResponse) throws {
-        func returnEarly() throws {
-            let params = try self.prepRequestParameters(response: response)
-            let result = Response(authResponse: response, parameters: params, storageIRI: nil)
-            self.callCompletion(.success(result))
+    // Get refresh token and an id token.
+    func requestTokens(params:CodeParameters) {
+        tokenRequest = TokenRequest(requestType: .code(params))
+        tokenRequest.send { [weak self] result in
+            guard let self = self else { return }
+
+            switch result {
+            case .failure(let error):
+                self.callCompletion(.failure(error))
+
+            case .success(let response):
+                guard let idToken = response.id_token,
+                    let accessToken = response.access_token,
+                    let refreshParameters = response.createRefreshParameters(params: params) else {
+                    self.callCompletion(.failure(ControllerError.noTokens))
+                    return
+                }
+                
+                guard let authorizationResponse = self.authorizationResponse else {
+                    self.callCompletion(.failure(ControllerError.noTokens))
+                    return
+                }
+                
+                self.getStorageIRI(response: authorizationResponse, idToken: idToken, accessToken: accessToken, refreshParameters: refreshParameters)
+            }
         }
-        
-        guard let idToken = response.idToken else {
-            try returnEarly()
+    }
+
+    func getStorageIRI(response: AuthorizationResponse, idToken: String, accessToken: String, refreshParameters: RefreshParameters) {
+        guard let jwksURL = providerConfig?.jwksURL else {
+            callCompletion(.failure(ControllerError.noJwksURL))
             return
         }
+        
+        func returnEarly() {
+            let serverParameters = ServerParameters(refresh: refreshParameters, storageIRI: nil, jwksURL: jwksURL)
+            let result = Response(authResponse: response, parameters: serverParameters, idToken: idToken, accessToken: accessToken)
+            callCompletion(.success(result))
+        }
 
-        // This doesn't check the signature of the id token; just want to pull out the webid early.
-        let token = try Token(idToken)
+        let token: Token
+        do {
+            // This doesn't check the signature of the id token; just want to pull out the webid early.
+            token = try Token(idToken)
+        } catch let error {
+            callCompletion(.failure(error))
+            return
+        }
         
         // I'm getting a nil webid in the id token in token.claims.webid, so using token.claims.sub instead.
         guard let webid = token.claims.sub else {
-            try returnEarly()
+            returnEarly()
             return
         }
         
         guard let webidURL = URL(string: webid) else {
-            try returnEarly()
+            returnEarly()
             return
         }
 
@@ -199,13 +237,10 @@ public class SignInController {
         getStorageIRI.get { result in
             switch result {
             case .success(let url):
-                do {
-                    let params = try self.prepRequestParameters(response: response)
-                    let result = Response(authResponse: response, parameters: params, storageIRI: url)
-                    self.callCompletion(.success(result))
-                } catch let error {
-                    self.callCompletion(.failure(error))
-                }
+                let serverParameters = ServerParameters(refresh: refreshParameters, storageIRI: url, jwksURL: jwksURL)
+                let result = Response(authResponse: response, parameters: serverParameters, idToken: idToken, accessToken: accessToken)
+                self.callCompletion(.success(result))
+
             case .failure(let error):
                 self.callCompletion(.failure(error))
             }
@@ -215,10 +250,6 @@ public class SignInController {
     func prepRequestParameters(response: AuthorizationResponse) throws -> CodeParameters {
         guard let tokenEndpoint = providerConfig?.tokenEndpoint else {
             throw ControllerError.generateParameters("Could not get tokenEndpoint")
-        }
- 
-        guard let jwksURL = providerConfig?.jwksURL else {
-            throw ControllerError.generateParameters("Could not get jwksURL")
         }
         
         guard let codeVerifier = auth?.request.codeVerifier else {
@@ -241,6 +272,6 @@ public class SignInController {
             throw ControllerError.generateParameters("Could not get clientSecret")
         }
 
-        return CodeParameters(tokenEndpoint: tokenEndpoint, jwksURL: jwksURL, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId, clientSecret: clientSecret, authenticationMethod: config.authenticationMethod)
+        return CodeParameters(tokenEndpoint: tokenEndpoint, codeVerifier: codeVerifier, code: code, redirectUri: redirectURL.absoluteString, clientId: clientId, clientSecret: clientSecret, authenticationMethod: config.authenticationMethod)
     }
 }

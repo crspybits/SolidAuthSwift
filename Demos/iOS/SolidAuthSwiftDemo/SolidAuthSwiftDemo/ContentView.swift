@@ -41,19 +41,14 @@ struct ContentView: View {
             
             VStack {
                 DemoButton(spacerHeight: nil, text: "Sign In") {
-                    client.start()
+                    client.start() { refreshParameters in
+                        server.refreshParams = refreshParameters
+                    }
                 }
                 .disabled(!client.initialized)
 
-                DemoButton(spacerHeight: spacerHeight, text: "Request tokens") {
-                    if let params = client.response?.parameters {
-                        server.requestTokens(params: params)
-                    }
-                }
-                .disabled(!client.initialized || client.response == nil)
-
                 DemoButton(spacerHeight: spacerHeight, text: "Validate access token") {
-                    if let accessToken = server.accessToken,
+                    if let accessToken = client.accessToken,
                         let jwksURL = client.response?.parameters.jwksURL {
                         server.validateToken(accessToken, jwksURL: jwksURL)
                     }
@@ -61,7 +56,7 @@ struct ContentView: View {
                 .disabled(!client.initialized || client.response == nil)
                         
                 DemoButton(spacerHeight: spacerHeight, text: "Validate id token") {
-                    if let idToken = server.idToken,
+                    if let idToken = client.idToken,
                         let jwksURL = client.response?.parameters.jwksURL {
                         server.validateToken(idToken, jwksURL: jwksURL)
                     }
@@ -79,7 +74,7 @@ struct ContentView: View {
                     client.logout()
                 }
                 .disabled(!client.initialized || client.response == nil ||
-                    client.response?.authResponse.idToken == nil)
+                    client.idToken == nil)
             }
             
             Spacer()

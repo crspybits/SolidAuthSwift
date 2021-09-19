@@ -5,6 +5,9 @@
 //  Created by Christopher G Prince on 7/25/21.
 //
 
+// The means of authenticating with the /token endpoint is far from obvious.
+// See https://forum.solidproject.org/t/the-use-of-dpop-in-the-token-endpoint/4664/6 and https://github.com/crspybits/SolidAuthSwift/issues/3
+
 import Foundation
 #if canImport(FoundationNetworking)
     import FoundationNetworking
@@ -14,6 +17,9 @@ public enum TokenEndpointAuthenticationMethod: String, Codable {
     case basic = "client_secret_basic"
     case post = "client_secret_post"
     // Not implementing jwt yet. And not sure what to use for `TokenEndpointAuthenticationMethod` if I use the DPoP header as indicated in https://solid.github.io/solid-oidc/primer/#authorization-code-pkce-flow-step-14
+    
+    // Really just for testing.
+    case none
 }
 
 extension TokenEndpointAuthenticationMethod {
@@ -58,20 +64,14 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
     }
     
     let requestType: TokenRequestType
-    let jwk: JWK
-    let privateKey: String
-    
+
     /**
      * Parameters:
      *   requestType:
      *      You should first make a .code request and then as needed with the resulting refresh token, do .refresh requests when the access token expires.
-     *   jwk: The public key
-     *   privateKey: The private key
      */
-    public init(requestType: TokenRequestType, jwk: JWK, privateKey: String) {
+    public init(requestType: TokenRequestType) {
         self.requestType = requestType
-        self.jwk = jwk
-        self.privateKey = privateKey
     }
 
     public func send(queue: DispatchQueue = .main, completion: @escaping (Result<TokenResponse, Error>) -> Void) {
@@ -103,6 +103,10 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
             let headerValue = requestType.basics.authenticationMethod.basicAuthorizationHeaderValue(clientId: requestType.basics.clientId, clientSecret: requestType.basics.clientSecret)
             request.addValue(headerValue, forHTTPHeaderField: Keys.authorization.rawValue)
         case .post:
+            break
+            
+        case .none:
+            // TESTING ONLY
             break
         }
         
@@ -172,6 +176,10 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
             values += [
                 URLQueryItem(name: Keys.clientSecret.rawValue, value: requestType.basics.clientSecret),
             ]
+            
+        case .none:
+            // TESTING
+            break
         }
         
         switch requestType {
@@ -215,7 +223,7 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
 }
 
 extension TokenRequest {
-    func addDPoPHeader(to request: inout URLRequest, tokenEndpoint: URL, httpMethod: String) throws {
+    func addDPoPHeader(to request: inout URLRequest, tokenEndpoint: URL, httpMethod: String, jwk: JWK, privateKey: String) throws {
         let htu = tokenEndpoint.absoluteString
 
         let bodyClaims = BodyClaims(htu: htu, htm: httpMethod, jti: UUID().uuidString)

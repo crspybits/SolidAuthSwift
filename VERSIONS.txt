@@ -1,5 +1,9 @@
 SolidAuthSwift
 
+Version 0.0.14 (9/18/21)
+    Bringing this in line with sending refresh token to server.
+    See https://github.com/crspybits/SolidAuthSwift/issues/6
+
 Version 0.0.13 (9/13/21)
     Now have authentication working with issuer: "https://broker.pod.inrupt.com"
         See https://github.com/crspybits/SolidAuthSwift/issues/3

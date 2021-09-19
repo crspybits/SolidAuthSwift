@@ -7,14 +7,15 @@
 
 import Foundation
 
-public struct RefreshParameters: ParametersBasics {
+public struct RefreshParameters: ParametersBasics, Codable {
     public let tokenEndpoint: URL
     public let refreshToken: String
     public let clientId: String
     public let clientSecret: String
     public let authenticationMethod: TokenEndpointAuthenticationMethod
+
     public var grantType: String {
-        "refresh_token"
+        GrantType.refreshToken.rawValue
     }
 
     public init(tokenEndpoint: URL, refreshToken: String, clientId: String, clientSecret: String, authenticationMethod: TokenEndpointAuthenticationMethod) {

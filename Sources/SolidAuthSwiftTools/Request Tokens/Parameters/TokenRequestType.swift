@@ -9,8 +9,8 @@ import Foundation
 
 public protocol ParametersBasics {
     var tokenEndpoint: URL { get }
-    var clientId: String { get }
     var grantType: String { get }
+    var clientId: String { get }
     var clientSecret: String { get }
 
     // This must be the same as that used in the registration request.

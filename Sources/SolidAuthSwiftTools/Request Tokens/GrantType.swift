@@ -13,11 +13,11 @@ public enum GrantType: String, Codable {
     case refreshToken = "refresh_token"
     
     // To a string, separated with blanks
-    static func toString(_ types: Set<GrantType>) -> String {
+    public static func toString(_ types: Set<GrantType>) -> String {
         types.map { $0.rawValue}.joined(separator: " ")
     }
     
-    static func toArray(_ types: Set<GrantType>) -> [String] {
+    public static func toArray(_ types: Set<GrantType>) -> [String] {
         return types.map { $0.rawValue}
     }
 }
