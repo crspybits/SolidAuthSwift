@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.16 (9/19/21)
+    Moved `func from(fromBase64` to a Decodable extension.
+    
 Version 0.0.15 (9/18/21)
     Refactor logout code.
     Move toBase64 method to a Encodable extension.

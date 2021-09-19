@@ -45,17 +45,17 @@ public struct CodeParameters: ParametersBasics, Codable {
     }
 }
 
-public extension CodeParameters {
-    static func from(fromBase64 base64: String) throws -> CodeParameters {
-        enum FromError: Error {
-            case cannotDecodeBase64
-        }
-        
-        guard let codeParametersData = Data(base64Encoded: base64) else {
+enum FromError: Error {
+    case cannotDecodeBase64
+}
+
+public extension Decodable {
+   static func from(fromBase64 base64: String) throws -> Self {
+        guard let data = Data(base64Encoded: base64) else {
             throw FromError.cannotDecodeBase64
         }
 
-        return try JSONDecoder().decode(CodeParameters.self, from: codeParametersData)
+        return try JSONDecoder().decode(Self.self, from: data)
     }
 }
 
