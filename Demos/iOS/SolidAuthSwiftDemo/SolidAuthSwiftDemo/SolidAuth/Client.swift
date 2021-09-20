@@ -18,9 +18,9 @@ class Client: ObservableObject {
     
     private let config = SignInConfiguration(
         // These work:
-        //issuer: "https://inrupt.net",
+        issuer: "https://inrupt.net",
         //issuer: "https://solidcommunity.net",
-        issuer: "https://broker.pod.inrupt.com",
+        //issuer: "https://broker.pod.inrupt.com",
         
         // This is failing: https://github.com/crspybits/SolidAuthSwift/issues/4
         // issuer: "https://trinpod.us",
@@ -96,6 +96,9 @@ class Client: ObservableObject {
                 // Save the response locally. Just for testing. In my actual app this will involve sending the client response to my custom server.
                 self.response = response
                 logger.debug("Controller response: \(response)")
+                
+                let base64 = try? response.parameters.toBase64()
+                logger.debug("ServerParameters, base64: \(String(describing: base64))")
                 
                 completion(response.parameters.refresh)
             }
