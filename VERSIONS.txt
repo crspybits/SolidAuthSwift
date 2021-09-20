@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.19 (9/19/21)
+    Add access token to ServerParameters.
+    
 Version 0.0.18 (9/19/21)
     Moved RDF code to iOS-only because of
         https://github.com/kasei/serd-parser/issues/3

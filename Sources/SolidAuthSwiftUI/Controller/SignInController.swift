@@ -244,7 +244,7 @@ public class SignInController {
         }
         
         func returnEarly() {
-            let serverParameters = ServerParameters(refresh: parameters.refreshParameters, storageIRI: nil, jwksURL: jwksURL, webid: webidURL.absoluteString)
+            let serverParameters = ServerParameters(refresh: parameters.refreshParameters, storageIRI: nil, jwksURL: jwksURL, webid: webidURL.absoluteString, accessToken: parameters.accessToken)
             let result = Response(authResponse: parameters.authorizationResponse, parameters: serverParameters, idToken: parameters.idToken, accessToken: parameters.accessToken)
             callCompletion(.success(result))
         }
@@ -253,7 +253,7 @@ public class SignInController {
         getStorageIRI.get { result in
             switch result {
             case .success(let url):
-                let serverParameters = ServerParameters(refresh: parameters.refreshParameters, storageIRI: url, jwksURL: jwksURL, webid: webidURL.absoluteString)
+                let serverParameters = ServerParameters(refresh: parameters.refreshParameters, storageIRI: url, jwksURL: jwksURL, webid: webidURL.absoluteString, accessToken: parameters.accessToken)
                 let result = Response(authResponse: parameters.authorizationResponse, parameters: serverParameters, idToken: parameters.idToken, accessToken: parameters.accessToken)
                 self.callCompletion(.success(result))
 

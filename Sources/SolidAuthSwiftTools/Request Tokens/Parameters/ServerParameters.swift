@@ -28,10 +28,14 @@ public struct ServerParameters: Codable {
     // I'm making this non-optional so that a server can be assured to have a unique way to identify Solid users.
     public let webid: String
     
-    public init(refresh: RefreshParameters, storageIRI: URL?, jwksURL: URL, webid: String) {
+    // An initial access token because (a) we have it on the client, and (b) to get the server started.
+    public let accessToken: String
+    
+    public init(refresh: RefreshParameters, storageIRI: URL?, jwksURL: URL, webid: String, accessToken: String) {
         self.refresh = refresh
         self.storageIRI = storageIRI
         self.jwksURL = jwksURL
         self.webid = webid
+        self.accessToken = accessToken
     }
 }
