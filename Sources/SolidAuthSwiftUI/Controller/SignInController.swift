@@ -46,6 +46,13 @@ public class SignInController {
     public var auth:Authorization!
     public var providerConfig: ProviderConfiguration!
     
+    public var codeParameters: CodeParameters? {
+        guard let response = authorizationResponse else {
+            return nil
+        }
+        return try? self.getCodeParameters(response: response)
+    }
+    
     // Retain the instance you make, before calling `start`, because this class does async operations.
     public init(config: SignInConfiguration) throws {
         guard let redirectURI = URL(string: config.redirectURI) else {
@@ -167,7 +174,7 @@ public class SignInController {
             case .success(let response):
                 self.authorizationResponse = response
                 do {
-                    let params = try self.prepRequestParameters(response: response)
+                    let params = try self.getCodeParameters(response: response)
                     self.requestTokens(params:params)
                 } catch let error {
                     self.callCompletion(.failure(error))
@@ -263,7 +270,7 @@ public class SignInController {
         }
     }
     
-    func prepRequestParameters(response: AuthorizationResponse) throws -> CodeParameters {
+    func getCodeParameters(response: AuthorizationResponse) throws -> CodeParameters {
         guard let tokenEndpoint = providerConfig?.tokenEndpoint else {
             throw ControllerError.generateParameters("Could not get tokenEndpoint")
         }

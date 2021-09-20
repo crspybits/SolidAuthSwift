@@ -1,5 +1,9 @@
 SolidAuthSwift
 
+Version 0.0.20 (9/20/21)
+    Enable token request, again, to use public/private key.
+    Add "Request tokens" back into demo UI.
+
 Version 0.0.19 (9/19/21)
     Add access token to ServerParameters.
     

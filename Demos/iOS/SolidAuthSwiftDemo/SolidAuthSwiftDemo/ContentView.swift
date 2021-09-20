@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SolidAuthSwiftTools
 
 struct DemoButton: View {
     let spacerHeight: CGFloat?
@@ -63,6 +64,14 @@ struct ContentView: View {
                 }
                 .disabled(!client.initialized || client.response == nil)
 
+                DemoButton(spacerHeight: spacerHeight, text: "Request tokens") {
+                    
+                    if let params = client.controller.codeParameters {
+                        server.requestTokens(params:params)
+                    }
+                }
+                .disabled(!client.initialized || client.response == nil)
+                
                 DemoButton(spacerHeight: spacerHeight, text: "Request user info") {
                     if let accessToken = client.accessToken,
                         let providerConfig = client.controller.providerConfig {

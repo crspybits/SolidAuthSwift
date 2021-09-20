@@ -8,6 +8,8 @@
 // The means of authenticating with the /token endpoint is far from obvious.
 // See https://forum.solidproject.org/t/the-use-of-dpop-in-the-token-endpoint/4664/6 and https://github.com/crspybits/SolidAuthSwift/issues/3
 
+// Does a request to create a refresh token have to have a DPoP header? https://forum.solidproject.org/t/generating-a-refresh-token-with-or-without-dpop-header/4675
+
 import Foundation
 #if canImport(FoundationNetworking)
     import FoundationNetworking
@@ -16,7 +18,6 @@ import Foundation
 public enum TokenEndpointAuthenticationMethod: String, Codable {
     case basic = "client_secret_basic"
     case post = "client_secret_post"
-    // Not implementing jwt yet. And not sure what to use for `TokenEndpointAuthenticationMethod` if I use the DPoP header as indicated in https://solid.github.io/solid-oidc/primer/#authorization-code-pkce-flow-step-14
     
     // Really just for testing.
     case none
@@ -64,14 +65,30 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
     }
     
     let requestType: TokenRequestType
-
+    let signingKeys: SigningKeys?
+    
+    // Private/public key pair.
+    public struct SigningKeys {
+        public let jwk: JWK
+        public let privateKey: String
+        public init(jwk: JWK, privateKey: String) {
+            self.jwk = jwk
+            self.privateKey = privateKey
+        }
+    }
+    
     /**
+     * I'm still working this out, but it appears that if you want to use the access tokens resulting from a refresh token (on a .code request) for *resource* DPoP signed requests, you need to use the public/private key pair.
+     *
      * Parameters:
      *   requestType:
      *      You should first make a .code request and then as needed with the resulting refresh token, do .refresh requests when the access token expires.
+     *   signingKeys:
+     *      If this is non-nil, a DPoP header is added as in https://solid.github.io/solid-oidc/primer/#authorization-code-pkce-flow-step-14
      */
-    public init(requestType: TokenRequestType) {
+    public init(requestType: TokenRequestType, signingKeys: SigningKeys? = nil) {
         self.requestType = requestType
+        self.signingKeys = signingKeys
     }
 
     public func send(queue: DispatchQueue = .main, completion: @escaping (Result<TokenResponse, Error>) -> Void) {
@@ -110,15 +127,14 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
             break
         }
         
-        // Not sure what authentication method should cause this to happen.
-        /*
-        do {
-            try addDPoPHeader(to: &request, tokenEndpoint: requestType.basics.tokenEndpoint, httpMethod: httpMethod)
-        } catch let error {
-            callCompletion(.failure(error))
-            return
+        if let signingKeys = signingKeys {
+            do {
+                try addDPoPHeader(to: &request, tokenEndpoint: requestType.basics.tokenEndpoint, httpMethod: httpMethod, signingKeys: signingKeys)
+            } catch let error {
+                callCompletion(.failure(error))
+                return
+            }
         }
-        */
         
         print("request: \(String(describing: request.url))")
         print("request.allHTTPHeaderFields: \(String(describing: request.allHTTPHeaderFields))")
@@ -223,11 +239,11 @@ public class TokenRequest<JWK: JWKCommon>: NSObject {
 }
 
 extension TokenRequest {
-    func addDPoPHeader(to request: inout URLRequest, tokenEndpoint: URL, httpMethod: String, jwk: JWK, privateKey: String) throws {
+    func addDPoPHeader(to request: inout URLRequest, tokenEndpoint: URL, httpMethod: String, signingKeys: SigningKeys) throws {
         let htu = tokenEndpoint.absoluteString
 
         let bodyClaims = BodyClaims(htu: htu, htm: httpMethod, jti: UUID().uuidString)
-        let dpop = DPoP(jwk: jwk, privateKey: privateKey, body: bodyClaims)
+        let dpop = DPoP(jwk: signingKeys.jwk, privateKey: signingKeys.privateKey, body: bodyClaims)
 
         let dpopHeader = try dpop.generate()
         
