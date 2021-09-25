@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.23 (9/24/21)
+    Changed away from using CommonCrypto in SolidAuthSwiftTools as it's not available on Linux.
+    
 Version 0.0.22 (9/24/21)
     Remove broken import
     

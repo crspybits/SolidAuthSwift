@@ -30,7 +30,11 @@ let package = Package(
         .package(name: "SwiftJWT2", url: "https://github.com/crspybits/Swift-JWT2.git", from: "3.6.201"),
         
         .package(url: "https://github.com/vapor/jwt-kit.git", from: "4.0.0"),
-        .package(name: "SerdParser", url: "https://github.com/kasei/serd-parser", from: "0.0.3"),        
+        .package(name: "SerdParser", url: "https://github.com/kasei/serd-parser", from: "0.0.3"),
+
+        //.package(name: "BlueCryptor", url: "https://github.com/Kitura/BlueCryptor", from: "0.1.0"),
+
+        //
     ],
     targets: [
         .target(
@@ -48,6 +52,7 @@ let package = Package(
                 "SwiftJWT2",
                 "AnyCodable",
                 .product(name: "JWTKit", package: "jwt-kit"),
+                //"BlueCryptor",
             ],
             path: "Sources/SolidAuthSwiftTools"),
             

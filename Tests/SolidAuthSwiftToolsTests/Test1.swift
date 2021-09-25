@@ -2,6 +2,7 @@ import XCTest
 @testable import SolidAuthSwiftTools
 import SwiftJWT2
 import CryptorRSA
+import CommonCrypto
 
 // Run tests:
 //  swift test --enable-test-discovery --filter SolidAuthSwiftToolsTests
@@ -61,11 +62,37 @@ final class SolidAuthSwiftToolsTests: XCTestCase {
             return
         }
         
-        let body = BodyClaims(htu: "https://secureauth.example/token", htm: "POST", jti: "4ba3e9ef-e98d-4644-9878-7160fa7d3eb8")
+        let body = BodyClaims(htu: "https://secureauth.example/token", htm: "POST", jti: "4ba3e9ef-e98d-4644-9878-7160fa7d3eb8", ath: nil)
         
         let dpop = DPoP(jwk: jwk, privateKey: privateKey, body: body)
         let signed = try dpop.generate()
         
         print("signedJWT: \(signed)")
+    }
+
+    static func sha256(_ inputString: String) -> Data? {
+        guard let data = inputString.data(using: .utf8) as NSData? else {
+            return nil
+        }
+        
+        let digestLength = Int(CC_SHA256_DIGEST_LENGTH)
+        var hashValue = [UInt8](repeating: 0, count: digestLength)
+        CC_SHA256(data.bytes, CC_LONG(data.length), &hashValue)
+        return NSData(bytes: hashValue, length: digestLength) as Data
+    }
+    
+    func testSHA() {
+        let uuidString = UUID().uuidString
+        guard let sha1 = Self.sha256(uuidString) else {
+            XCTFail()
+            return
+        }
+        
+        guard let sha2 = EncodingUtils.sha256(uuidString) else {
+            XCTFail()
+            return
+        }
+        
+        XCTAssert(sha1 == sha2)
     }
 }

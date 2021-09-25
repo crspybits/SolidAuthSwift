@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import CommonCrypto
+import Cryptor
 
 public class EncodingUtils {
     public static func encodeBase64urlNoPadding(_ data: Data) -> String {
@@ -19,14 +19,11 @@ public class EncodingUtils {
         base64string = base64string.replacingOccurrences(of: "=", with: "")
         return base64string
     }
-    
+
     public static func sha256(_ inputString: String) -> Data? {
-        guard let data = inputString.data(using: .utf8) as NSData? else {
-            return nil
-        }
-        let digestLength = Int(CC_SHA256_DIGEST_LENGTH)
-        var hashValue = [UInt8](repeating: 0, count: digestLength)
-        CC_SHA256(data.bytes, CC_LONG(data.length), &hashValue)
-        return NSData(bytes: hashValue, length: digestLength) as Data
+        let sha256 = Digest(using: .sha256)
+        _ = sha256.update(string: inputString)
+        let digest = sha256.final()
+        return Data(digest)
     }
 }
