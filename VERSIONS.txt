@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.22 (9/24/21)
+    Remove broken import
+    
 Version 0.0.21 (9/24/21)
     Added ath claim to DPoP.
     

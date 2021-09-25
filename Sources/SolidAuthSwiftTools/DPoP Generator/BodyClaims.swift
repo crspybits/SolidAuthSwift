@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftJWT2
-import Base64URLEncoding
 
 // From: https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-13s
 /*
