@@ -165,14 +165,17 @@ public class AuthorizationRequest: NSObject, Codable  {
     }
     
     class func codeChallengeS256(forVerifier codeVerifier: String?) -> String? {
-        if codeVerifier == nil {
+        guard let codeVerifier = codeVerifier else {
             return nil
         }
         // generates the code_challenge per spec https://tools.ietf.org/html/rfc7636#section-4.2
         // code_challenge = BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))
         // NB. the ASCII conversion on the code_verifier entropy was done at time of generation.
-        let sha256Verifier: Data? = TokenUtilities.sha256(codeVerifier)
-        return TokenUtilities.encodeBase64urlNoPadding(sha256Verifier)
+        guard let sha256Verifier = EncodingUtils.sha256(codeVerifier) else {
+            return nil
+        }
+        
+        return EncodingUtils.encodeBase64urlNoPadding(sha256Verifier)
     }
     
     func authorizationRequestURL() throws -> URL? {

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftJWT2
+import Base64URLEncoding
 
 // From: https://solid.github.io/authentication-panel/solid-oidc-primer/#authorization-code-pkce-flow-step-13s
 /*
@@ -24,16 +25,33 @@ Token Body:
 "iat": 1603306128: The date the token was issued, in this case October 21, 2020 15:52:33 GMT.
  */
 public struct BodyClaims: Claims {
+    enum BodyClaimsError: Error {
+        case couldNotGetSHA
+    }
+    
     public let htu: String
     public let htm: String
     public let jti: String
     public let iat: Date?
+    public let ath: String?
     
     // Create a new instance for each DPoP generated. This will assign the current Date to the `iat` field.
-    public init(htu: String, htm: String, jti: String) {
+    // For ath: Only needed if you are sending an access token in the request. See https://datatracker.ietf.org/doc/html/draft-ietf-oauth-dpop-03#section-4.3 and https://github.com/SyncServerII/ServerSolidAccount/issues/5#issuecomment-927001056s
+    public init(htu: String, htm: String, jti: String, ath: String?) {
         self.htu = htu
         self.htm = htm
         self.jti = jti
         self.iat = Date()
+        self.ath = ath
+    }
+}
+
+public extension BodyClaims {
+    static func athFromAccessToken(_ accessToken: String) throws -> String {
+        guard let data = EncodingUtils.sha256(accessToken) else {
+            throw BodyClaimsError.couldNotGetSHA
+        }
+        
+        return EncodingUtils.encodeBase64urlNoPadding(data)
     }
 }

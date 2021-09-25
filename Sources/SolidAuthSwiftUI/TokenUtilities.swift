@@ -9,6 +9,7 @@
 
 import Foundation
 import CommonCrypto
+import SolidAuthSwiftTools
 
 private let kFormUrlEncodedAllowedCharacters = " *-._0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -27,19 +28,7 @@ class TokenUtilities: NSObject {
         let decodedData = Data(base64Encoded: body ?? "", options: [])
         return decodedData
     }
-    
-    
-    class func encodeBase64urlNoPadding(_ data: Data?) -> String? {
-        var base64string = data?.base64EncodedString(options: [])
-        // converts base64 to base64url
-        base64string = base64string?.replacingOccurrences(of: "+", with: "-")
-        base64string = base64string?.replacingOccurrences(of: "/", with: "_")
-        // strips padding
-        base64string = base64string?.replacingOccurrences(of: "=", with: "")
-        return base64string
-    }
-    
-    
+
     class func randomURLSafeString(withSize size: Int) -> String? {
         //       var randomData = Data(count: size)  // TODO:  Use cssm_data ???
         var randomData = Data(count: size)
@@ -53,18 +42,8 @@ class TokenUtilities: NSObject {
         if result != errSecSuccess {
             return nil
         }
-        return self.encodeBase64urlNoPadding(randomData)
+        return EncodingUtils.encodeBase64urlNoPadding(randomData)
     }
-    
-    
-    class func sha256(_ inputString: String?) -> Data? {
-        let verifierData = inputString?.data(using: .utf8) as NSData?
-        let digestLength = Int(CC_SHA256_DIGEST_LENGTH)
-        var hashValue = [UInt8](repeating: 0, count: digestLength)
-        CC_SHA256(verifierData?.bytes, CC_LONG((verifierData?.length)!), &hashValue)
-        return NSData(bytes: hashValue, length: digestLength) as Data
-    }
-    
     
     class func redact(_ inputString: String?) -> String? {
         if inputString == nil {

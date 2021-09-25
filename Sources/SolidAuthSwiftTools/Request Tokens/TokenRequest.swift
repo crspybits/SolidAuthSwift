@@ -9,6 +9,7 @@
 // See https://forum.solidproject.org/t/the-use-of-dpop-in-the-token-endpoint/4664/6 and https://github.com/crspybits/SolidAuthSwift/issues/3
 
 // Does a request to create a refresh token have to have a DPoP header? https://forum.solidproject.org/t/generating-a-refresh-token-with-or-without-dpop-header/4675
+// Answer: No. I am able to generate a refresh token on the iOS client (with no DPopP header), and then use it on the custom server side *with* a DPoP header in a /token request to refresh an acess token.
 
 import Foundation
 #if canImport(FoundationNetworking)
@@ -242,7 +243,7 @@ extension TokenRequest {
     func addDPoPHeader(to request: inout URLRequest, tokenEndpoint: URL, httpMethod: String, signingKeys: SigningKeys) throws {
         let htu = tokenEndpoint.absoluteString
 
-        let bodyClaims = BodyClaims(htu: htu, htm: httpMethod, jti: UUID().uuidString)
+        let bodyClaims = BodyClaims(htu: htu, htm: httpMethod, jti: UUID().uuidString, ath: nil)
         let dpop = DPoP(jwk: signingKeys.jwk, privateKey: signingKeys.privateKey, body: bodyClaims)
 
         let dpopHeader = try dpop.generate()

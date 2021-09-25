@@ -1,5 +1,8 @@
 SolidAuthSwift
 
+Version 0.0.21 (9/24/21)
+    Added ath claim to DPoP.
+    
 Version 0.0.20 (9/20/21)
     Enable token request, again, to use public/private key.
     Add "Request tokens" back into demo UI.
